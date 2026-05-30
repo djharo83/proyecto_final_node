@@ -1,18 +1,63 @@
 const db = require('../config/db');
 
-// Obtener TODOS los artículos con su foto principal
-const getAll = async () => {
-    const query = `
+// =================================================================
+// FUNCIONES HELPER PRIVADAS (No se exportan, solo se usan aquí)
+// Para que en el buscador se pueda filtrar por categoría, precio y estado del artículo
+// =================================================================
+
+const buildFiltersQuery = (filters) => {
+    let filterQuery = '';
+    const filterParams = [];
+
+    if (filters.category_id) {
+        filterQuery += ` AND a.category_id = ?`;
+        filterParams.push(filters.category_id);
+    }
+    if (filters.min_price) {
+        filterQuery += ` AND a.price >= ?`;
+        filterParams.push(filters.min_price);
+    }
+    if (filters.max_price) {
+        filterQuery += ` AND a.price <= ?`;
+        filterParams.push(filters.max_price);
+    }
+    if (filters.condition) {
+        filterQuery += ` AND a.\`condition\` = ?`; 
+        filterParams.push(filters.condition);
+    }
+
+    return { filterQuery, filterParams };
+};
+
+// =================================================================
+// MÉTODOS DEL MODELO EXPORTADOS
+// =================================================================
+
+const getAll = async (page = 1, pageSize = 10, filters = {}) => {
+    const offset = (page - 1) * pageSize;
+    
+    // 1. Llamamos a nuestra función Helper para que nos monte los filtros
+    const { filterQuery, filterParams } = buildFiltersQuery(filters);
+    
+    // 2. Construimos la consulta base inyectando los filtros
+    let query = `
         SELECT a.*, p.url as main_photo 
         FROM articles a 
         LEFT JOIN article_photos p ON a.id = p.article_id AND p.\`order\` = 0
+        WHERE a.status = 'Publicado'
+        ${filterQuery} 
+        ORDER BY a.created_at DESC 
+        LIMIT ? OFFSET ?
     `;
-    
-    const [result] = await db.query(query);
+
+    // 3. Juntamos los parámetros de los filtros con los de la paginación
+    const finalParams = [...filterParams, Number(pageSize), Number(offset)];
+
+    // 4. Ejecutamos
+    const [result] = await db.query(query, finalParams);
     return result;
 };
 
-// Obtener detalle de un artículo con TODAS sus fotos (este lo dejamos igual porque ya es simple)
 const getById = async (id) => {
     const [articleRows] = await db.query('SELECT * FROM articles WHERE id = ?', [id]);
     if (articleRows.length === 0) return null;
