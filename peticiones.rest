@@ -1,1 +1,5 @@
-GET http://localhost:3000/api/test
+### Obtener TODOS los artículos
+GET http://localhost:3000/api/articles
+
+### Obtener un artículo por ID
+GET http://localhost:3000/api/articles/1
