@@ -1,5 +1,7 @@
+const cloudinary = require('../config/cloudinary'); 
 const ArticlesModel = require('../models/articles.model');
 
+// 1. Obtener todos los artículos (Con paginación y filtros)
 const getAllArticles = async (req, res) => {
     try {
         // 1. Recogemos los parámetros de paginación
@@ -27,6 +29,7 @@ const getAllArticles = async (req, res) => {
     }
 };
 
+// 2. Obtener un artículo por su ID con sus fotos
 const getArticleById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -42,4 +45,53 @@ const getArticleById = async (req, res) => {
     }
 };
 
-module.exports = { getAllArticles, getArticleById };
+// 3. Crear un artículo subiendo imágenes a Cloudinary
+const createArticle = async (req, res) => {
+    try {
+        const { user_id, category_id, title, description, price, condition, location, images } = req.body;
+        
+        const photoUrls = [];
+
+        // Si el cliente nos envía imágenes en Base64
+        if (images && images.length > 0) {
+            for (const base64Img of images) {
+                // Subimos a Cloudinary y guardamos la URL devuelta
+                const uploadResult = await cloudinary.uploader.upload(base64Img, {
+                    folder: 'wallapop_clone_articles'
+                });
+                photoUrls.push(uploadResult.secure_url);
+            }
+        }
+
+        // Guardamos en la base de datos 
+        const articleId = await ArticlesModel.create({
+            user_id, category_id, title, description, price, condition, location
+        }, photoUrls);
+
+        res.status(201).json({
+            message: "Artículo creado con éxito",
+            articleId,
+            photosUploaded: photoUrls
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// 4. Eliminar un artículo y sus fotos asociadas
+const deleteArticle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await ArticlesModel.deleteById(id);
+        
+        if (!deleted) {
+            return res.status(404).json({ message: "Artículo no encontrado" });
+        }
+        
+        res.json({ message: "Artículo eliminado con éxito" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { getAllArticles, getArticleById, createArticle, deleteArticle };

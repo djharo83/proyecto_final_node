@@ -32,7 +32,7 @@ const buildFiltersQuery = (filters) => {
 // =================================================================
 // MÉTODOS DEL MODELO EXPORTADOS
 // =================================================================
-
+// 1. Obtener todos los artículos (Con paginación y filtros)
 const getAll = async (page = 1, pageSize = 10, filters = {}) => {
     const offset = (page - 1) * pageSize;
     
@@ -58,6 +58,7 @@ const getAll = async (page = 1, pageSize = 10, filters = {}) => {
     return result;
 };
 
+// 2. Obtener un artículo por ID con sus fotos
 const getById = async (id) => {
     const [articleRows] = await db.query('SELECT * FROM articles WHERE id = ?', [id]);
     if (articleRows.length === 0) return null;
@@ -70,4 +71,41 @@ const getById = async (id) => {
     return article;
 };
 
-module.exports = { getAll, getById };
+// 3. Crear artículo secuencialmente (Estilo clase)
+const create = async (articleData, photoUrls) => {
+    const { user_id, category_id, title, description, price, condition, location } = articleData;
+
+    // A. Insertamos el artículo de manera sencilla
+    const [articleResult] = await db.query(
+        `INSERT INTO articles (user_id, category_id, title, description, price, \`condition\`, status, location) 
+         VALUES (?, ?, ?, ?, ?, ?, 'Publicado', ?)`,
+        [user_id, category_id, title, description, price, condition, location]
+    );
+    
+    const articleId = articleResult.insertId;
+
+    // B. Si el controlador nos pasa URLs de fotos, las guardamos una a una
+    if (photoUrls && photoUrls.length > 0) {
+        for (let i = 0; i < photoUrls.length; i++) {
+            await db.query(
+                "INSERT INTO article_photos (article_id, url, `order`) VALUES (?, ?, ?)",
+                [articleId, photoUrls[i], i]
+            );
+        }
+    }
+
+    return articleId;
+};
+
+// 4. Eliminar artículo y sus fotos asociadas
+const deleteById = async (id) => {
+    // A. Borramos las fotos asociadas de la tabla secundaria
+    await db.query("DELETE FROM article_photos WHERE article_id = ?", [id]);
+
+    // B. Borramos el registro del artículo de la tabla principal
+    const [result] = await db.query("DELETE FROM articles WHERE id = ?", [id]);
+
+    return result.affectedRows > 0;
+};
+
+module.exports = { getAll, getById, create, deleteById };
