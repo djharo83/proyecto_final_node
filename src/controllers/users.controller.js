@@ -51,8 +51,17 @@ const login = async(req, res) => {
 
 }
 
+const edit = async (req, res) => {
+    // El userId viene del token, no de la URL
+    const userId = req.user.id;
+
+    await UserModel.updateById(userId, req.body);
+    const usuario = await UserModel.selectById(userId);
+
+    res.json(usuario);
+}
 
 
 module.exports = {
-    getAll, register,login
+    getAll, register,login,edit
 }

@@ -12,7 +12,7 @@ const selectAll = async () => {
 
 const selectById = async (userId) => {
     const [result] = await db.query(
-        'select * from clientes where id = ?',
+        'select * from users where id = ?',
         [userId]
     );
     if(result.length === 0) return null
@@ -41,4 +41,15 @@ const insert = async({username, email, password}) => {
 }
 
 
-module.exports = {selectAll,selectById,insert,selectByEmail};
+const updateById = async (userId, body) => {
+    const { username, email, location, avatar_url } = body;
+    const [result] = await db.query(
+        'UPDATE users SET username = ?, email = ?, location = ?, avatar_url = ? WHERE id = ?',
+        [username, email, location, avatar_url, userId]
+    );
+    return result;
+}
+
+
+
+module.exports = {selectAll,selectById,insert,selectByEmail ,updateById};
