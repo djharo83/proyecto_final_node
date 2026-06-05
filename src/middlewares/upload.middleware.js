@@ -1,5 +1,5 @@
 const multer = require('multer');
-
+// Multer intercepta el archivo y lo deja en RAM para que nuestro siguiente middleware lo pueda subir a Cloudinary
 const upload = multer({
     storage: multer.memoryStorage(),
     fileFilter: (req, file, cb) => {
