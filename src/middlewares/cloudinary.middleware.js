@@ -29,7 +29,7 @@ const uploadToCloudinary = async (req, res, next) => {
         const uploadPromises = req.files.map(file => uploadBufferToCloudinary(file.buffer));
         const photoUrls = await Promise.all(uploadPromises);
         
-        // ¡MAGIA!: Inyectamos las URLs resultantes en el req.body 
+        // Inyectamos las URLs resultantes en el req.body 
         // para que el controlador las reciba como si fueran texto normal
         req.body.photoUrls = photoUrls;
         
