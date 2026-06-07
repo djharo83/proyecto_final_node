@@ -1,23 +1,86 @@
-const TestModel = require("../models/favorites.model");
+const favorites = require("../models/favorites.model");
+const { StatusCodes } = require("http-status-codes");
 
-const checkDb = async (req, res) => {
+const get = async (req, res, next) => {
+  
+  const { id } = req.params;
+
+  if (!id)
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "ID requerido" });
+
   try {
-    // Guardamos los datos que vienen del modelo
-    const users = await TestModel.getAllUsers();
+    
+    const favorite = await favorites.selectById(id);
 
-    res.json({
-      status: "OK",
-      message: "Datos recuperados con éxito",
-      count: users.length, // Opcional: para saber cuántos hay
-      data: users, // Datos recuperados de la base de datos
-    });
+    if (!favorite) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Favorite no encontrado" });
+    }
+
+    return res.status(StatusCodes.OK).json({favorite});
+
   } catch (error) {
-    res.status(500).json({
-      status: "Error",
-      message: "Error al recuperar los datos",
-      error: error.message,
-    });
+    next(error);
   }
 };
 
-module.exports = { checkDb };
+const getAll = async (req, res, next) => {
+  
+  try {
+    
+    const favoritesList = await favorites.selectAll();
+    
+    return res.status(StatusCodes.OK).json({ favorites: favoritesList });
+  
+  } catch (error) {
+    next(error);
+  }
+};
+
+const create = async (req, res, next) => {
+  
+  try {
+    
+    const result = await favorites.insert(req.body);
+
+    const insertId = result.insertId || result.insert_id || null;
+
+    if (!insertId) {
+      return res.status(StatusCodes.CREATED).json({ message: "Favorite creado (sin id devuelto)", result: result });
+    }
+
+    const favorite = await favorites.selectById(insertId);
+    
+    return res.status(StatusCodes.CREATED).json({ message: "Favorite creado exitosamente", favorite });
+  
+  } catch (error) {
+    next(error);
+  }
+};
+
+const remove = async (req, res, next) => {
+  
+  const { id } = req.params;
+  
+  try {
+    
+    const favorite = await favorites.selectById(id);
+
+    if (!favorite) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "Favorite no encontrado" });
+    }
+
+    await favorites.deleteById(id);
+      
+    return res.status(StatusCodes.OK).json({ message: "Favorite eliminado exitosamente", favorite: favorite });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  get,
+  getAll,
+  create,
+  remove
+};

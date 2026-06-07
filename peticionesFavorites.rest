@@ -1,1 +1,17 @@
-GET http://localhost:3000/api/test
+### Obtener todos los favoritos
+GET http://localhost:3000/api/favorites/
+
+#### Obtener favorito por ID
+GET http://localhost:3000/api/favorites/3
+
+### Crear una nuevo favorito
+POST http://localhost:3000/api/favorites
+Content-Type: application/json
+
+{
+  "user_id": 1,
+  "article_id": 3
+}
+
+### Eliminar un favorito existente
+DELETE http://localhost:3000/api/favorites/18

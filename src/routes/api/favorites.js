@@ -1,11 +1,10 @@
-const router = require('express').Router();
-const { getAllArticles, getArticleById, createArticle, deleteArticle } = require('../../controllers/articles.controller');
-const upload = require('../../middlewares/upload.middleware'); 
-const uploadToCloudinary = require('../../middlewares/cloudinary.middleware'); 
+const router = require("express").Router();
 
-router.get('/', getAllArticles);
-router.get('/:id', getArticleById);
-router.post('/', upload.array('images', 5), uploadToCloudinary,  createArticle); // Permite subir hasta 5 imágenes por artículo
-router.delete('/:id', deleteArticle);
+const favoritesController = require("../../controllers/favorites.controller");
+
+router.get("/:id", favoritesController.get);
+router.get("/", favoritesController.getAll);
+router.post("/", favoritesController.create);
+router.delete("/:id", favoritesController.remove);
 
 module.exports = router;
