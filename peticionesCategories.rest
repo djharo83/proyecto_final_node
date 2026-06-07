@@ -1,0 +1,27 @@
+### Obtener todas las categories
+GET http://localhost:3000/api/categories/
+
+#### Obtener category por ID
+GET http://localhost:3000/api/categories/1
+
+### Crear una nueva category
+POST http://localhost:3000/api/categories
+Content-Type: application/json
+
+{
+  "name": "Nueva category De Prueba",
+  "slug": "nueva-category-4"
+}
+
+
+### Actualizar una category existente
+PUT http://localhost:3000/api/categories/14
+Content-Type: application/json
+
+{
+  "name": "Nueva category De Prueba Modificada",
+  "slug": "nueva-category-modificada"
+}
+
+### Eliminar una category existente
+DELETE http://localhost:3000/api/categories/14
