@@ -1,6 +1,8 @@
 // Creation and configuration of the Express APP
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 const app = express();
 app.use(cors());
@@ -12,6 +14,9 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Route configuration
 // Ex.
 app.use('/api', require('./routes/api'));
+
+// --- NUEVA RUTA PARA SWAGGER ---
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // 404 handler
 app.use((req, res, next) => {
