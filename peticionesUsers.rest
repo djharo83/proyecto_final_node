@@ -41,3 +41,46 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJpYXQiOjE3
     "location": "Valencia",
     "avatar_url": null
 }
+
+### pRUEBA DE SI RENDER FUNCIONA
+GET https://proyecto-final-node-5pwe.onrender.com/api/test
+
+###REEGISTRO VIA RRENDER###
+###
+###REEGISTRO VIA RRENDER###
+
+###REEGISTRO VIA RRENDER###
+@baseUrl = https://proyecto-final-node-5pwe.onrender.com
+
+### Registro
+POST {{baseUrl}}/api/users/register
+Content-Type: application/json
+
+{
+    "username": "Render_Prueba",
+    "email": "Render_prueba1@gmail.com",
+    "password": "chorizo"
+}
+
+### Login
+POST {{baseUrl}}/api/users/login
+Content-Type: application/json
+
+{
+    "email": "Render_editado@email.com",
+    "password": "chorizo"
+}
+
+### Ver perfil
+
+PUT {{baseUrl}}/api/users/profile
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MDgzMDc5MSwiZXhwIjoxNzgwOTE3MTkxfQ.vnHaKgUYbAJycsYmGlkCp7WtElMJB9amA7PTk9Z1uxc
+
+{
+    "username": "Render_editado",
+    "email": "Render_editado@email.com",
+    "location": "Madrid",
+    "avatar_url": null
+}
+
