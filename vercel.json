@@ -6,21 +6,10 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://main.d17pu06mnswuzy.amplifyapp.com",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type,Authorization"
-      },
-      "dest": "src/app.js"
+      "source": "/(.*)",
+      "destination": "/src/app.js"
     }
-  ],
-  "functions": {
-    "src/app.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  }
+  ]
 }
