@@ -1,0 +1,52 @@
+### 1. Obtener primera página (Por defecto trae 10 artículos)
+GET http://localhost:3000/api/articles
+
+### 2. Obtener segunda página (Si hay 12 en la DB, aquí debería traer solo 2)
+GET http://localhost:3000/api/articles?page=3
+
+### 3. Filtrar por Categoría: Electrónica (category_id = 1)
+GET http://localhost:3000/api/articles?category_id=1
+
+### 4. Filtrar por rango de Precio (Entre 20 y 100 euros)
+GET http://localhost:3000/api/articles?min_price=20&max_price=100
+
+### 5. Filtrar por Estado (Solo los que están "Como nuevo")
+GET http://localhost:3000/api/articles?condition=Como nuevo
+
+### 6. COMBO FILTROS: Electrónica + Menos de 300€ + Página 1 + 5 resultados max
+GET http://localhost:3000/api/articles?category_id=1&max_price=300&page=1&pageSize=5
+
+### 7. Obtener artículo por ID (El ID 1 tiene un array de imágenes)
+GET http://localhost:3000/api/articles/1
+
+### 8. Comprobar qué pasa si busco un ID que no existe
+GET http://localhost:3000/api/articles/9999
+
+### 9. Filtrar por Libros (Trae 5 artículos reales)
+GET http://localhost:3000/api/articles?category_id=5
+
+### 10. Filtrar por Ropa barata (category_id 2, menos de 100€)
+GET http://localhost:3000/api/articles?category_id=2&max_price=100
+
+### 11. Filtrar por artículos Nuevos de cualquier tipo
+GET http://localhost:3000/api/articles?condition=Nuevo
+
+### 12. Crear un nuevo artículo con una foto
+Se tiene que ejecutar por terminal con cURL o Postman, no se puede hacer desde aqui porque contiene archivos. 
+curl -X POST http://localhost:3000/api/articles \
+  -F "user_id=1" \
+  -F "category_id=1" \
+  -F "title=Teclado Gaming Razer" \
+  -F "description=Teclado mecanico RGB" \
+  -F "price=89.99" \
+  -F "condition=Como nuevo" \
+  -F "location=Alicante" \
+  -F "images=@C:\Users\Adrián Amat\Downloads\436-razer-blackwidow-v4-x-teclado-mecanico-gaming-con-razer-chroma-rgb-yellow-switch-especificaciones.webp;type=image/webp" \
+  -F "images=@C:\Users\Adrián Amat\Downloads\3460-razer-blackwidow-v4-x-teclado-mecanico-gaming-con-razer-chroma-rgb-yellow-switch-mejor-precio.webp;type=image/webp" \
+  -F "images=@C:\Users\Adrián Amat\Downloads\1679-razer-blackwidow-v4-x-teclado-mecanico-gaming-con-razer-chroma-rgb-yellow-switch.webp;type=image/webp"
+
+### 13. Eliminar un artículo por ID (Prueba con un ID de los que hayas creado)
+DELETE http://localhost:3000/api/articles/12
+
+###
+GET http://localhost:3000/api/articles/34
