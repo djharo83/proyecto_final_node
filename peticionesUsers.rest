@@ -10,9 +10,9 @@ POST http://localhost:3000/api/users/register
 Content-Type: application/json
 
 {
-    "username": "Julio Iglesias",
-    "email": "Julioiglesias@gmail.com",
-    "password":"megustaelvino"
+    "username": "Ignacio30",
+    "email": "Ignacio30@gmail.com",
+    "password":"chorizo"
 }
 
 ###LOGIN###
@@ -22,8 +22,8 @@ Content-Type: application/json
 
 {
 
-    "email": "Julioiglesias@gmail.com",
-    "password":"megustaelvino"
+    "email": "Ignacio30@gmail.com",
+    "password":"chorizo"
 }
 
 
@@ -33,11 +33,11 @@ Content-Type: application/json
 
 PUT http://localhost:3000/api/users/profile
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJpYXQiOjE3ODAzMzE0NjJ9.Qr7QknqRpT5O4lkr4yEMUgEcMfMhvNuWSGamjeTC3FQ
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJpYXQiOjE3ODA2ODA5ODN9.ac19NX9T7DrQidYkcsdTjDFc6QcmEm6L2nfvOKAdiIc
 
 {
-    "username": "carlos_nuevo",
-    "email": "carlo33@email.com",
+    "username": "pepito2",
+    "email": "pepit23@email.com",
     "location": "Valencia",
     "avatar_url": null
 }

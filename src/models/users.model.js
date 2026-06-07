@@ -25,7 +25,7 @@ const selectByEmail = async (email) =>{
         'select * from users where email = ?',
         [email]
     );
-    console.log(result)
+    //console.log(result)
     if (result.length === 0) return null
     return result[0]
 }

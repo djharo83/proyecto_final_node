@@ -44,10 +44,27 @@ const login = async(req, res) => {
         })
     }
 
+    // res.json({
+    //     message: 'Login correcto',
+    //     token: jwt.sign( {userId: user.id , rol: user.role}, process.env.JWT_SECRET_KEY)
+    // });
+
     res.json({
-        message: 'Login correcto',
-        token: jwt.sign( {userId: user.id , rol: user.rol}, process.env.JWT_SECRET_KEY)
-    });
+    message: 'Login correcto',
+    token: jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: '24h' }
+    ),
+    role:user.role
+});
+
+
+
+
+
+
+
 
 }
 
