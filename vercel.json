@@ -10,7 +10,12 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "src/app.js"
+      "destination": "/src/app.js"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "config/swagger/swagger.yaml"
+    }
+  }
 }

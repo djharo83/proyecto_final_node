@@ -25,7 +25,10 @@ app.use(
     swaggerUi.serve, 
     swaggerUi.setup(swaggerSpec, {
         customCssUrl: CSS_URL,
-        customJs: JS_URL
+        customJs: JS_URL,
+        swaggerOptions: {
+            layout: "BaseLayout"
+        }
     })
 );
 
