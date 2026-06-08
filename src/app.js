@@ -15,19 +15,20 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Ex.
 app.use('/api', require('./routes/api'));
 
-// Define las URLs del CSS y JS oficiales de Swagger desde una CDN
-const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css";
-const JS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js";
-// --- NUEVA RUTA PARA SWAGGER ADAPTADA A VERCEL---
-//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// URLs oficiales de la CDN de Swagger
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const JS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.min.js";
+const PRESET_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-standalone-preset.min.js";
+
 app.use(
     '/api-docs', 
     swaggerUi.serve, 
     swaggerUi.setup(swaggerSpec, {
         customCssUrl: CSS_URL,
         customJs: JS_URL,
+        customJsStr: PRESET_URL,
         swaggerOptions: {
-            layout: "BaseLayout"
+            validatorUrl: null
         }
     })
 );

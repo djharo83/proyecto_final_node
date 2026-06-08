@@ -1,6 +1,5 @@
 {
   "version": 2,
-
   "builds": [
     {
       "src": "src/app.js",
@@ -9,13 +8,17 @@
   ],
   "rewrites": [
     {
+      "source": "/api-docs(.*)",
+      "destination": "/src/app.js"
+    },
+    {
       "source": "/(.*)",
       "destination": "/src/app.js"
     }
   ],
   "functions": {
-    "api/index.js": {
-      "includeFiles": "config/swagger/swagger.yaml"
+    "src/app.js": {
+      "includeFiles": "src/config/swagger/swagger.yaml"
     }
   }
 }
