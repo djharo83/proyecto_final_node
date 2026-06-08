@@ -8,7 +8,7 @@ const SERVER_URL = IS_VERCEL
   ? `https://${process.env.VERCEL_URL || 'proyecto-final-node-five.vercel.app'}` 
   : `http://localhost:${process.env.PORT || 3000}`;
 
-// Cargamos el archivo usando siempre la ruta segura de la misma carpeta
+// __dirname funciona en Vercel siempre que indiques el archivo en vercel.json
 const yamlPath = path.join(__dirname, './swagger.yaml');
 const swaggerSpec = yaml.load(yamlPath);
 

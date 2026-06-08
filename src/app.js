@@ -19,9 +19,9 @@ app.use('/api', require('./routes/api'));
 const IS_VERCEL = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
 let swaggerOptions = {
+    explorer: true,
     swaggerOptions: {
-        // Esto le dice a Swagger que renderice de forma estática sin redirecciones raras
-        url: '/api-docs/swagger.json' 
+        url: '/api-docs/swagger.json' // Le da una ruta fija al JSON para que no use scripts internos rotos
     }
 };
 
@@ -33,12 +33,12 @@ if (IS_VERCEL) {
     };
 }
 
-// Ruta para servir el JSON crudo (opcional, pero ayuda a Swagger a no perderse)
+// Endpoint para servir el JSON que necesita el explorador de Swagger
 app.get('/api-docs/swagger.json', (req, res) => {
     res.json(swaggerSpec);
 });
 
-// Ruta principal limpia para la interfaz gráfica
+// La ruta principal que ahora será infalible
 app.use(
     '/api-docs', 
     swaggerUi.serve, 
