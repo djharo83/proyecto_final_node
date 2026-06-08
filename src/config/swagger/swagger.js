@@ -20,7 +20,7 @@ const options = {
   },
   // Rutas donde Swagger buscará los comentarios para documentar
   //apis: [path.join(__dirname, '../routes/*.js')],
-  apis: [path.join(__dirname, "..", "routes", "**", "*.js").replace(/\\/g, "/")],
+  apis: [path.join(__dirname, '../routes/*.js')],
 };
 
 const swaggerSpec = yaml.load(path.join(__dirname, './swagger.yaml'));
