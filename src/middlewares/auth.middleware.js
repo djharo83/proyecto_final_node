@@ -3,14 +3,21 @@ const UserModel = require('../models/users.model');
 
 const checkToken = async (req, res, next) => {
     // ¿Está el token en la cabecera?
-    if (!req.headers['authorization']) {
+    
+    const authHeader = req.headers['authorization'];
+    
+    if (!authHeader) {
         return res.status(403).json({
             message: 'El token es obligatorio en la cabecera Authorization'
         });
     }
 
     // ¿Es un token válido?
-    const token = req.headers.authorization;
+    // Separamos "Bearer" del token usando el espacio intermedio (swagger y postman lo envían así)
+    let token = authHeader;
+if (authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+}
 
     let payload;
     try {

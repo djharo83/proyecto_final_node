@@ -19,7 +19,7 @@ const register = async (req, res) => {
     req.body.password = bcrypt.hashSync(req.body.password, 8);
 
     const result = await UserModel.insert(req.body);
-    res.json(result);
+    res.status(201).json(result);
 }
 
 const login = async(req, res) => {
