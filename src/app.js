@@ -15,24 +15,30 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Ex.
 app.use('/api', require('./routes/api'));
 
-// Detectamos el entorno
+//Detectamos el entorno para configurar Swagger de forma adecuada (en Vercel no podemos servir archivos estáticos, así que le decimos a Swagger que cargue los suyos desde CDN)
 const IS_VERCEL = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
-// Creamos un objeto de opciones vacío para local
-let swaggerOptions = {};
+let swaggerOptions = {
+    swaggerOptions: {
+        // Esto le dice a Swagger que renderice de forma estática sin redirecciones raras
+        url: '/api-docs/swagger.json' 
+    }
+};
 
-// Si estamos en Vercel, aplicamos el parche de las CDNs para que no se rompa en producción
 if (IS_VERCEL) {
     swaggerOptions = {
+        ...swaggerOptions,
         customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css",
-        customJs: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.min.js",
-        swaggerOptions: {
-            validatorUrl: null
-        }
+        customJs: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.min.js"
     };
 }
 
-// Inicializamos Swagger pasándole las opciones dinámicas
+// Ruta para servir el JSON crudo (opcional, pero ayuda a Swagger a no perderse)
+app.get('/api-docs/swagger.json', (req, res) => {
+    res.json(swaggerSpec);
+});
+
+// Ruta principal limpia para la interfaz gráfica
 app.use(
     '/api-docs', 
     swaggerUi.serve, 
