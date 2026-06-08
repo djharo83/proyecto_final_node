@@ -10,15 +10,15 @@ const SERVER_URL = IS_VERCEL
   ? `https://${process.env.VERCEL_URL || 'proyecto-final-node-five.vercel.app'}` 
   : `http://localhost:${process.env.PORT || 3000}`;
 
-// 3. Resolvemos la ruta del archivo según el entorno real de tu árbol
+// 3. Resolvemos la ruta del archivo según tu árbol real de carpetas
 const yamlPath = IS_VERCEL
-  ? path.join(process.cwd(), 'src/config/swagger/swagger.yaml') // En Vercel empieza desde la raíz, entra a src/config/...
-  : path.join(__dirname, './swagger.yaml');                     // En local lee la misma carpeta
+  ? path.join(process.cwd(), 'src/config/swagger/swagger.yaml') // En Vercel (desde la raíz)
+  : path.join(__dirname, './swagger.yaml');                     // En Local (misma carpeta)
 
-// 4. Cargamos tu archivo YAML original intacto
+// 4. Cargamos tu archivo YAML original
 const swaggerSpec = yaml.load(yamlPath);
 
-// 5. Sobrescribimos dinámicamente los servidores para ambos entornos
+// 5. Sobrescribimos dinámicamente los servidores para que no falle en producción
 swaggerSpec.servers = [
   {
     url: SERVER_URL,
