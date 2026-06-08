@@ -15,22 +15,28 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Ex.
 app.use('/api', require('./routes/api'));
 
-// URLs oficiales de la CDN de Swagger
-const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
-const JS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.min.js";
-const PRESET_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-standalone-preset.min.js";
+// Detectamos el entorno
+const IS_VERCEL = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
-app.use(
-    '/api-docs', 
-    swaggerUi.serve, 
-    swaggerUi.setup(swaggerSpec, {
-        customCssUrl: CSS_URL,
-        customJs: JS_URL,
-        customJsStr: PRESET_URL,
+// Creamos un objeto de opciones vacío para local
+let swaggerOptions = {};
+
+// Si estamos en Vercel, aplicamos el parche de las CDNs para que no se rompa en producción
+if (IS_VERCEL) {
+    swaggerOptions = {
+        customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css",
+        customJs: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.min.js",
         swaggerOptions: {
             validatorUrl: null
         }
-    })
+    };
+}
+
+// Inicializamos Swagger pasándole las opciones dinámicas
+app.use(
+    '/api-docs', 
+    swaggerUi.serve, 
+    swaggerUi.setup(swaggerSpec, swaggerOptions)
 );
 
 // 404 handler
