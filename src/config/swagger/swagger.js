@@ -2,28 +2,28 @@
 const yaml = require('yamljs');
 const path = require("path");
 
-const options = {
-  failOnErrors: true,
-  definition: {
-    openapi: "3.0.0", // Versión de OpenAPI que usaremos
-    info: {
-      title: "API Node.js",
-      version: "1.0.0",
-      description: "Documentación de la API de Node.js con Swagger",
-    },
-    servers: [
-      {
-        url: "http://localhost:3000", // Pon aquí el puerto que use tu app
-        description: "Servidor de Desarrollo",
-      },
-    ],
-  },
-  // Rutas donde Swagger buscará los comentarios para documentar
-  //apis: [path.join(__dirname, '../routes/*.js')],
-  apis: [path.join(__dirname, "..", "routes", "**", "*.js").replace(/\\/g, "/")],
-};
+// 1. Detectamos si estamos en Vercel o en local
+const IS_VERCEL = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
-const swaggerSpec = yaml.load(path.join(__dirname, './swagger.yaml'));
-console.log("Swagger paths:", swaggerSpec.paths);
+// 2. Definimos dinámicamente la URL del servidor
+const SERVER_URL = IS_VERCEL 
+  ? `https://${process.env.VERCEL_URL || 'tu-proyecto.vercel.app'}` 
+  : `http://localhost:${process.env.PORT || 3000}`;
+
+// 3. Resolvemos la ruta del archivo según el entorno para que no falle
+const yamlPath = IS_VERCEL
+  ? path.join(process.cwd(), 'config/swagger/swagger.yaml') // Ruta relativa desde la raíz en Vercel
+  : path.join(__dirname, './swagger.yaml');        // Ruta local
+
+// 4. Cargamos tu archivo YAML original intacto
+const swaggerSpec = yaml.load(yamlPath);
+
+// 5. Sobrescribimos dinámicamente la propiedad 'servers' para que no falle en producción
+swaggerSpec.servers = [
+  {
+    url: SERVER_URL,
+    description: IS_VERCEL ? "Servidor de Producción (Vercel)" : "Servidor de Desarrollo (Local)",
+  },
+];
 
 module.exports = swaggerSpec;
