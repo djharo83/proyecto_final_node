@@ -2,7 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
+const swaggerSpec = require('./config/swagger/swagger');
 
 const app = express();
 app.use(cors());
@@ -15,8 +15,19 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Ex.
 app.use('/api', require('./routes/api'));
 
-// --- NUEVA RUTA PARA SWAGGER ---
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Define las URLs del CSS y JS oficiales de Swagger desde una CDN
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css";
+const JS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js";
+// --- NUEVA RUTA PARA SWAGGER ADAPTADA A VERCEL---
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+    '/api-docs', 
+    swaggerUi.serve, 
+    swaggerUi.setup(swaggerSpec, {
+        customCssUrl: CSS_URL,
+        customJs: JS_URL
+    })
+);
 
 // 404 handler
 app.use((req, res, next) => {

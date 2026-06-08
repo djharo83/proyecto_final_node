@@ -1,0 +1,355 @@
+openapi: 3.0.0
+info:
+  title: API Proyecto Final
+  version: 1.0.0
+  description: Documentación de los endpoints del backend en Node.js
+
+paths:
+
+  /api/articles:
+    get:
+      summary: Obtiene todos los artículos
+      tags:
+        - Artículos
+      responses:
+        200:
+          description: Lista de artículos.
+    post:
+      summary: Crea un nuevo artículo con imágenes
+      tags:
+        - Artículos
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - price
+                - user_id
+                - category_id
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                  description: ID del usuario que publica el artículo
+                category_id:
+                  type: integer
+                  example: 1
+                  description: ID de la categoría a la que pertenece
+                title:
+                  type: string
+                  example: "Teclado Gaming Razer"
+                description:
+                  type: string
+                  example: "Teclado mecanico RGB"
+                price:
+                  type: number
+                  format: float
+                  example: 89.99
+                condition:
+                  type: string
+                  example: "Como nuevo"
+                location:
+                  type: string
+                  example: "Alicante"
+                status:
+                  type: string
+                  description: Estado actual del artículo en la plataforma
+                  enum:
+                    - 'Borrador'
+                    - 'Publicado'
+                    - 'En revisión'
+                    - 'Retirado'
+                    - 'Vendido'
+                    - 'Reservado'
+                  example: "Publicado"
+                  default: 'Publicado'
+                images:
+                  type: array
+                  description: Selecciona hasta 5 archivos de imagen
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        201:
+          description: Artículo creado.
+
+  /api/articles/{id}:
+    get:
+      summary: Obtiene un artículo por su ID
+      tags:
+        - Artículos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Artículo obtenido.
+    delete:
+      summary: Elimina un artículo por su ID
+      tags:
+        - Artículos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado.
+
+  /api/categories:
+    get:
+      summary: Obtiene todas las categorías
+      tags:
+        - Categorías
+      responses:
+        200:
+          description: Lista de categorías obtenida con éxito.
+    post:
+      summary: Crea una nueva categoría
+      tags:
+        - Categorías
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  example: "Nueva categoría"
+                slug:
+                  type: string
+                  minLength: 1
+                  example: "new-category"
+      responses:
+        201:
+          description: Categoría creada con éxito.
+
+  /api/categories/{id}:
+    get:
+      summary: Obtiene una categoría por su ID
+      tags:
+        - Categorías
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Categoría encontrada.
+    put:
+      summary: Actualiza una categoría por su ID
+      tags:
+        - Categorías
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  description: Nuevo nombre de la categoría
+                  example: "Modificar Nueva categoría"
+                slug:
+                  type: string
+                  minLength: 1
+                  description: Nuevo slug de la categoría
+                  example: "update-category"
+      responses:
+        200:
+          description: Actualizado.
+    delete:
+      summary: Elimina una categoría por su ID
+      tags:
+        - Categorías
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado.
+
+  /api/favorites:
+    get:
+      summary: Obtiene todos los favoritos
+      tags:
+        - Favoritos
+      responses:
+        200:
+          description: Lista de favoritos.
+    post:
+      summary: Añade un elemento a favoritos
+      tags:
+        - Favoritos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - article_id
+              properties:
+                user_id:
+                  type: integer
+                  description: ID del usuario que añade el favorito
+                  example: 1
+                article_id:
+                  type: integer
+                  description: ID del artículo que se añade como favorito
+                  example: 3
+      responses:
+        201:
+          description: Favorito Creado.
+
+  /api/favorites/{id}:
+    get:
+      summary: Obtiene un favorito por su ID
+      tags:
+        - Favoritos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Favorito obtenido.
+    delete:
+      summary: Elimina un favorito por su ID
+      tags:
+        - Favoritos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado.
+
+  /api/users:
+    get:
+      summary: Obtiene todos los usuarios registrados
+      tags:
+        - Usuarios
+      responses:
+        200:
+          description: Listado obtenido.
+
+  /api/users/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        201:
+          description: Registrado.
+
+  /api/users/login:
+    post:
+      summary: Iniciar sesión de usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Token generado.
+
+  /api/users/profile:
+    put:
+      summary: Editar el perfil del usuario autenticado
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                location:
+                  type: string
+                avatar_url:
+                  type: string
+      responses:
+        200:
+          description: Actualizado.
+
+# Componente de seguridad
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Introduce tu token JWT sin la palabra 'Bearer'. Solo el texto del token.

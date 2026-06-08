@@ -1,14 +1,15 @@
 // config/swagger.js
-const swaggerJSDoc = require("swagger-jsdoc");
+const yaml = require('yamljs');
 const path = require("path");
 
 const options = {
+  failOnErrors: true,
   definition: {
     openapi: "3.0.0", // Versión de OpenAPI que usaremos
     info: {
-      title: "Mi API en Node.js",
+      title: "API Node.js",
       version: "1.0.0",
-      description: "Documentación de las rutas de Categorías y Favoritos",
+      description: "Documentación de la API de Node.js con Swagger",
     },
     servers: [
       {
@@ -18,10 +19,11 @@ const options = {
     ],
   },
   // Rutas donde Swagger buscará los comentarios para documentar
+  //apis: [path.join(__dirname, '../routes/*.js')],
   apis: [path.join(__dirname, "..", "routes", "**", "*.js").replace(/\\/g, "/")],
 };
 
-const swaggerSpec = swaggerJSDoc(options);
+const swaggerSpec = yaml.load(path.join(__dirname, './swagger.yaml'));
 console.log("Swagger paths:", swaggerSpec.paths);
 
 module.exports = swaggerSpec;
