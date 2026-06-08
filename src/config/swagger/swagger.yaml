@@ -50,7 +50,13 @@ paths:
                   example: 89.99
                 condition:
                   type: string
-                  example: "Como nuevo"
+                  description: Condición del artículo que se va a publicar
+                  enum:
+                    - 'Nuevo'
+                    - 'Como nuevo'
+                    - 'Buen estado'
+                    - 'Aceptable'
+                  example: "Nuevo"
                 location:
                   type: string
                   example: "Alicante"
