@@ -8,12 +8,133 @@ paths:
 
   /api/articles:
     get:
-      summary: Obtiene todos los artículos
+      summary: Obtiene todos los artículos con paginación y filtros
+      description: Retorna una lista paginada de artículos que están en estado 'Publicado', permitiendo filtrar por categoría, rango de precios y estado/condición.
       tags:
         - Artículos
+      parameters:
+        # --- PARÁMETROS DE PAGINACIÓN ---
+        - name: page
+          in: query
+          description: Número de la página que se quiere recuperar.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: Cantidad de artículos por página.
+          required: false
+          schema:
+            type: integer
+            default: 10
+
+        # --- PARÁMETROS DE FILTRADO ---
+        - name: category_id
+          in: query
+          description: Filtrar por el ID de la categoría.
+          required: false
+          schema:
+            type: integer
+        - name: min_price
+          in: query
+          description: Precio mínimo del artículo.
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: max_price
+          in: query
+          description: Precio máximo del artículo.
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: condition
+          in: query
+          description: Estado físico del artículo (ej. 'Nuevo', 'Usado').
+          required: false
+          schema:
+            type: string
+
       responses:
         200:
-          description: Lista de artículos.
+          description: Lista de artículos y metadatos de paginación devueltos con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: object
+                    description: Metadatos de la paginación (útil para el Frontend).
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      pageSize:
+                        type: integer
+                        example: 10
+                      count:
+                        type: integer
+                        description: Cantidad de elementos devueltos en esta página.
+                        example: 10
+                  results:
+                    type: array
+                    description: Listado de artículos que coinciden con la búsqueda.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 3
+                        title:
+                          type: string
+                          example: "Bicicleta de montaña"
+                        description:
+                          type: string
+                          example: "Bicicleta de montaña poco usada"
+                        location:
+                          type: string
+                          example: "Almería"
+                        price:
+                          type: number
+                          format: float
+                          example: 250.50
+                        condition:
+                          type: string
+                          example: "Usado"
+                        status:
+                          type: string
+                          example: "Publicado"
+                        category_id:
+                          type: integer
+                          example: 3
+                        main_photo:
+                          type: string
+                          nullable: true
+                          example: "https://imagenes.com/foto1.jpg"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2026-06-09T20:00:00Z"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2026-06-09T20:00:00Z"
+        500:
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Error de conexión con la base de datos"
     post:
       summary: Crea un nuevo artículo con imágenes
       tags:
