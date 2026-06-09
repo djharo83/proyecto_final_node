@@ -6,14 +6,11 @@
       "use": "@vercel/node"
     }
   ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/src/app.js"
-    }
-  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
   "functions": {
-    "src/app.js": {
+    "index.js": {
       "includeFiles": "src/config/swagger/swagger.yaml"
     }
   }

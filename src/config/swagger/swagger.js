@@ -1,6 +1,7 @@
 // src/config/swagger/swagger.js
 const yaml = require('yamljs');
 const path = require("path");
+const fs = require("fs");
 
 const IS_VERCEL = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
 
@@ -10,7 +11,7 @@ const SERVER_URL = IS_VERCEL
 
 // __dirname funciona en Vercel siempre que indiques el archivo en vercel.json
 const yamlPath = path.join(__dirname, './swagger.yaml');
-const swaggerSpec = yaml.load(yamlPath);
+const swaggerSpec = yaml.parse(fs.readFileSync(yamlPath, 'utf8'));
 
 swaggerSpec.servers = [
   {
