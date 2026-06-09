@@ -6,7 +6,7 @@ info:
 
 paths:
 
-/api/articles:
+  /api/articles:
     get:
       summary: Obtiene todos los artículos con paginación y filtros
       description: Retorna una lista paginada de artículos que están en estado 'Publicado', permitiendo filtrar por categoría, rango de precios y estado/condición.
