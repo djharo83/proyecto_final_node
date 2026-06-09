@@ -10,7 +10,7 @@
     "NODE_ENV": "production"
   },
   "functions": {
-    "index.js": {
+    "src/app.js": {
       "includeFiles": "src/config/swagger/swagger.yaml"
     }
   }
