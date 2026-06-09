@@ -2,7 +2,6 @@
   "version": 2,
   "functions": {
     "src/app.js": {
-      "runtime": "@vercel/node",
       "includeFiles": "src/config/swagger/swagger.yaml"
     }
   },
