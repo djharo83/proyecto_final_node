@@ -1,17 +1,18 @@
 {
   "version": 2,
-  "builds": [
+  "functions": {
+    "src/app.js": {
+      "runtime": "@vercel/node",
+      "includeFiles": "src/config/swagger/swagger.yaml"
+    }
+  },
+  "routes": [
     {
-      "src": "src/app.js",
-      "use": "@vercel/node"
+      "src": "/(.*)",
+      "dest": "src/app.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "src/app.js": {
-      "includeFiles": "src/config/swagger/swagger.yaml"
-    }
   }
 }
