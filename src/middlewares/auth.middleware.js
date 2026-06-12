@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/users.model');
+const ArticlesModel = require('../models/articles.model');
+
 
 const checkToken = async (req, res, next) => {
     // ¿Está el token en la cabecera?
@@ -52,4 +54,31 @@ const checkRole = (roles) => {
     }
 }
 
-module.exports = { checkToken, checkRole }
+// Comprueba si el usuario autenticado es el creador del artículo
+const isOwner = async (req, res, next) => {
+    try {
+        // Cogemos el ID de la URL (artículo) 
+        const articleId = req.params.id; 
+        
+        // Buscamos el artículo en la base de datos
+        const article = await ArticlesModel.getById(articleId);
+
+        if (!article) {
+            return res.status(404).json({ message: 'Artículo no encontrado' });
+        }
+
+        // Comparamos el ID del dueño del artículo con el ID del usuario logueado (que viene del token)
+        if (article.user_id !== req.user.id) {
+            return res.status(403).json({ message: 'Acceso denegado: No eres el propietario de este artículo' });
+        }
+
+        // Si es suyo, le dejamos pasar al controlador
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+module.exports = { checkToken, checkRole, isOwner }
