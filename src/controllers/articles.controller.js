@@ -29,7 +29,7 @@ const getAllArticles = async (req, res) => {
     }
 };
 
-// Controlador para la Landing Page
+// 2. Controlador para la Landing Page
 const getLandingArticles = async (req, res) => {
     try {
         // Obtenemos simplemente los 10 últimos publicados, sin filtros
@@ -46,7 +46,7 @@ const getLandingArticles = async (req, res) => {
 };
 
 
-// 2. Obtener un artículo por su ID con sus fotos
+// 3. Obtener un artículo por su ID con sus fotos
 const getArticleById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -57,6 +57,27 @@ const getArticleById = async (req, res) => {
         }
         
         res.json(article);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// 4. Obtener los artículos del usuario logueado
+const getMyArticles = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
+        
+        // El ID del usuario lo obtenemos inyectado por checkToken
+        const loggedUserId = req.user.id;
+        
+        // Llamamos al modelo pasándole el user_id para filtrar solo los suyos
+        const articles = await ArticlesModel.getAll(page, pageSize, { user_id: loggedUserId });
+        
+        res.json({
+            info: { page, pageSize, count: articles.length },
+            results: articles
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -101,4 +122,9 @@ const deleteArticle = async (req, res) => {
     }
 };
 
-module.exports = { getAllArticles, getLandingArticles, getArticleById, createArticle, deleteArticle };
+module.exports = { getAllArticles, 
+                   getLandingArticles, 
+                   getArticleById, 
+                   getMyArticles,
+                   createArticle, 
+                   deleteArticle };
