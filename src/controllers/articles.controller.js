@@ -84,7 +84,7 @@ const getMyArticles = async (req, res) => {
 };
 
 
-// 3. Crear un artículo subiendo imágenes (Archivos físicos) a Cloudinary
+// 5. Crear un artículo subiendo imágenes (Archivos físicos) a Cloudinary
 const createArticle = async (req, res) => {
     try {
         // Obtenemos los datos normales Y las URLs que nos inyectó nuestro middleware
@@ -106,7 +106,55 @@ const createArticle = async (req, res) => {
     }
 };
 
-// 4. Eliminar un artículo y sus fotos asociadas
+
+// 6. Controlador para editar todo el artículo (PUT)
+const updateArticle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Ejecutamos la actualización y el modelo nos devolverá el artículo ya modificado
+        const updatedArticle = await ArticlesModel.updateById(id, req.body);
+        
+        if (!updatedArticle) {
+            return res.status(404).json({ message: "Artículo no encontrado" });
+        }
+        
+        res.json({
+            message: "Artículo actualizado con éxito",
+            article: updatedArticle
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// 7. Controlador para cambiar solo el estado/status (PATCH)
+const updateArticleStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // Esperamos recibir por ejemplo: { "status": "Vendido" }
+        
+        if (!status) {
+            return res.status(400).json({ message: "El campo status es obligatorio" });
+        }
+        
+        const updatedArticle = await ArticlesModel.updateStatus(id, status);
+        
+        if (!updatedArticle) {
+            return res.status(404).json({ message: "Artículo no encontrado" });
+        }
+        
+        res.json({
+            message: `Estado del artículo actualizado a '${status}' con éxito`,
+            article: updatedArticle
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+// 8. Eliminar un artículo y sus fotos asociadas
 const deleteArticle = async (req, res) => {
     try {
         const { id } = req.params;
@@ -127,4 +175,8 @@ module.exports = { getAllArticles,
                    getArticleById, 
                    getMyArticles,
                    createArticle, 
+                   updateArticle,
+                   updateArticleStatus,
                    deleteArticle };
+
+                   

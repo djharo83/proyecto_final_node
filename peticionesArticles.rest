@@ -113,3 +113,31 @@ Authorization: Bearer {{tokenOwner}}
 ### Obtener mis propios artículos (Logueado como Ignacio30)
 GET http://localhost:3000/api/articles/user/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+
+
+
+###  EDITAR un artículo (PUT) - Cambiamos título y precio
+### condition: {Como nuevo, Nuevo, Buen estado}
+PUT http://localhost:3000/api/articles/45
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "title": "Teclado Razer Modificado",
+  "description": "Descripción actualizada mediante PUT",
+  "price": 75.00,
+  "condition": "Como nuevo",
+  "location": "Alicante"
+}
+
+
+### 2. MARCAR COMO VENDIDO (PATCH) - Solo modificamos el estado del artículo
+### status: {Borrador, Publicado, En revision, Retirado, Vendido}
+PATCH http://localhost:3000/api/articles/45/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+Content-Type: application/json
+
+{
+  "status": "Vendido"
+}
