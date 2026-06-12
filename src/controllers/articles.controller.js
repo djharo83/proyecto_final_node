@@ -9,13 +9,13 @@ const getAllArticles = async (req, res) => {
         const pageSize = parseInt(req.query.pageSize) || 10;
         
         // 2. Recogemos los filtros
-        const { category_id, min_price, max_price, condition } = req.query;
-        const filters = { category_id, min_price, max_price, condition };
+        const { category_id, min_price, max_price, condition, search, filterStatus } = req.query;
+        const filters = { category_id, min_price, max_price, condition, search, filterStatus };
         
         // 3. Ejecutamos la búsqueda pasándolo todo al modelo
         const articles = await ArticlesModel.getAll(page, pageSize, filters);
         
-        // (Opcional, pero muy pro para Front): Devolvemos metadatos de la página
+        // Devolvemos metadatos de la página
         res.json({
             info: {
                 page: page,
@@ -28,6 +28,23 @@ const getAllArticles = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Controlador para la Landing Page
+const getLandingArticles = async (req, res) => {
+    try {
+        // Obtenemos simplemente los 10 últimos publicados, sin filtros
+        // Le pasamos la página 1, límite 10, y un objeto de filtros vacío
+        const articles = await ArticlesModel.getAll(1, 10, {});
+        
+        res.json({
+            message: "Artículos recientes para la Landing",
+            results: articles
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
 // 2. Obtener un artículo por su ID con sus fotos
 const getArticleById = async (req, res) => {
@@ -84,4 +101,4 @@ const deleteArticle = async (req, res) => {
     }
 };
 
-module.exports = { getAllArticles, getArticleById, createArticle, deleteArticle };
+module.exports = { getAllArticles, getLandingArticles, getArticleById, createArticle, deleteArticle };

@@ -50,3 +50,13 @@ DELETE http://localhost:3000/api/articles/12
 
 ###
 GET http://localhost:3000/api/articles/34
+
+### ------------------------------------------------
+### Búsqueda genérica (Palabra clave en título o descripción)
+GET http://localhost:3000/api/articles?search=teclado
+
+### Búsqueda combinada: Palabra clave + Estado (Solo los teclados que estén publicados)
+GET http://localhost:3000/api/articles?search=teclado&filterStatus=Publicado
+
+### Landing Page (Los 10 últimos artículos sin filtros)
+GET http://localhost:3000/api/articles/landing

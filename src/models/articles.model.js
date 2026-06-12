@@ -25,6 +25,18 @@ const buildFiltersQuery = (filters) => {
         filterQuery += ` AND a.\`condition\` = ?`; 
         filterParams.push(filters.condition);
     }
+    if (filters.search) {
+        filterQuery += ` AND (a.title LIKE ? OR a.description LIKE ?)`;
+        filterParams.push(`%${filters.search}%`, `%${filters.search}%`);
+    }
+    if (filters.filterStatus) {
+        filterQuery += ` AND a.status = ?`;
+        filterParams.push(filters.filterStatus);
+    }
+    if (filters.user_id) {
+        filterQuery += ` AND a.user_id = ?`;
+        filterParams.push(filters.user_id);
+    }
 
     return { filterQuery, filterParams };
 };
