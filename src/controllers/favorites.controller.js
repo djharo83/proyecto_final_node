@@ -2,7 +2,7 @@ const favorites = require("../models/favorites.model");
 const { StatusCodes } = require("http-status-codes");
 
 const get = async (req, res, next) => {
-  
+
   const { id } = req.params;
 
   if (!id)
@@ -23,13 +23,15 @@ const get = async (req, res, next) => {
   }
 };
 
-const getAll = async (req, res, next) => {
+const getAllFavoritesUser = async (req, res, next) => {
   
+  const { id : userId } = req.user; // Assuming id is available in req.user. after authentication toma el id de req.user y lo asigna a userId
+
   try {
     
-    const favoritesList = await favorites.selectAll();
+    const favoritesUser = await favorites.selectFavoritesUser(userId);
     
-    return res.status(StatusCodes.OK).json({ favorites: favoritesList });
+    return res.status(StatusCodes.OK).json({ favoritesUsers: favoritesUser });
   
   } catch (error) {
     next(error);
@@ -80,7 +82,7 @@ const remove = async (req, res, next) => {
 
 module.exports = {
   get,
-  getAll,
+  getAllFavoritesUser,
   create,
   remove
 };
