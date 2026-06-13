@@ -1,26 +1,16 @@
-const UserModel = require('../models/users.model');
+const LoginRegistroModel = require('../models/loginregistro.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
-const getAll = async (req, res) => {
-    try {
-        const clientes = await UserModel.selectAll();
-        res.json(clientes);
-    } catch(error){
-        res.status(500).json({
-            message: 'Hay un error gravvisimo'
-        });
-    }
-}
 
 const register = async (req, res) => {
     // Body: username,email,password
     req.body.password = bcrypt.hashSync(req.body.password, 8);
 
-    const result = await UserModel.insert(req.body);
-    const usuario = await UserModel.selectById(result.insertId)
-    res.status(201).json({message:'Usuario creado correctamente',
+    const result = await LoginRegistroModel.insert(req.body);
+    const usuario = await LoginRegistroModel.selectById(result.insertId)
+    res.status(201).json({
+        message: 'Usuario creado correctamente',
         user: usuario});
 }
 
@@ -31,7 +21,7 @@ const login = async(req, res) => {
 
 
     // ¿Existe el email en la BD?
-    const user = await UserModel.selectByEmail(email)
+    const user = await LoginRegistroModel.selectByEmail(email)
     if (!user) {
         res.status(401).json({
             message: 'Error email y/o contraseña 1'
@@ -70,17 +60,8 @@ const login = async(req, res) => {
 
 }
 
-const edit = async (req, res) => {
-    // El userId viene del token, no de la URL
-    const userId = req.user.id;
-
-    await UserModel.updateById(userId, req.body);
-    const usuario = await UserModel.selectById(userId);
-
-    res.json(usuario);
-}
 
 
 module.exports = {
-    getAll, register,login,edit
+    register,login
 }
