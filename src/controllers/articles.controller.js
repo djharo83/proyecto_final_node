@@ -84,13 +84,16 @@ const getMyArticles = async (req, res) => {
 };
 
 
-// 5. Crear un artículo subiendo imágenes (Archivos físicos) a Cloudinary
+// 5. Crear un artículo subiendo imágenes a Cloudinary (Protegido contra suplantación)
 const createArticle = async (req, res) => {
     try {
-        // Obtenemos los datos normales Y las URLs que nos inyectó nuestro middleware
-        const { user_id, category_id, title, description, price, condition, location, photoUrls } = req.body;
+        // Quitamos user_id del req.body
+        const { category_id, title, description, price, condition, location, photoUrls } = req.body;
+        
+        // ¡Mejora de seguridad! Extraemos el ID directamente del token verificado
+        const user_id = req.user.id; 
 
-        // Guardamos directamente en la base de datos
+        // Guardamos en la base de datos usando el ID seguro
         const articleId = await ArticlesModel.create({
             user_id, category_id, title, description, price, condition, location
         }, photoUrls);
