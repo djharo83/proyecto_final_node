@@ -141,3 +141,44 @@ Content-Type: application/json
 {
   "status": "Vendido"
 }
+
+
+### =================================================================
+### PRUEBAS DE VALIDACIÓN Y SEGURIDAD AVANZADA (YUP Y MIDDLEWARES)
+### =================================================================
+
+### 1. Test de Middleware de ID: Le pasamos texto en vez de número
+### Debe devolver: 400 "El ID del artículo debe ser un número válido"
+GET http://localhost:3000/api/articles/patata
+
+
+### 2. Test de Middleware de ID: Le pasamos un número que no existe
+### Debe devolver: 404 "No existe ningún artículo con ese ID"
+GET http://localhost:3000/api/articles/999999
+
+
+###
+@tokenOwner = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+### 3. Test de Yup (Crear): Faltan campos y el precio es negativo
+### Debe devolver: 400 "Error de validación" con el detalle de errores
+POST http://localhost:3000/api/articles
+Authorization: Bearer {{tokenOwner}}
+Content-Type: application/json
+
+{
+  "title": "A", 
+  "description": "Sin categoría, ni ubicación y precio negativo",
+  "price": -50.00,
+  "condition": "Inventado"
+}
+
+
+### 4. Test de Yup (PATCH Status): Estado no válido
+### Debe devolver: 400 y avisar de que "Ese estado del ciclo de vida no existe"
+PATCH http://localhost:3000/api/articles/48/status
+Authorization:  {{tokenOwner}}
+Content-Type: application/json
+
+{
+  "status": "Vendido"
+}

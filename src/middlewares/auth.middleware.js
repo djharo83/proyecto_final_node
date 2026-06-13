@@ -57,22 +57,12 @@ const checkRole = (roles) => {
 // Comprueba si el usuario autenticado es el creador del artículo
 const isOwner = async (req, res, next) => {
     try {
-        // Cogemos el ID de la URL (artículo) 
-        const articleId = req.params.id; 
-        
-        // Buscamos el artículo en la base de datos
-        const article = await ArticlesModel.getById(articleId);
+        // Como 'checkArticleId' se ejecutará justo antes en la ruta, ya tenemos el artículo aquí:
+        const article = req.article; 
 
-        if (!article) {
-            return res.status(404).json({ message: 'Artículo no encontrado' });
-        }
-
-        // Comparamos el ID del dueño del artículo con el ID del usuario logueado (que viene del token)
         if (article.user_id !== req.user.id) {
             return res.status(403).json({ message: 'Acceso denegado: No eres el propietario de este artículo' });
         }
-
-        // Si es suyo, le dejamos pasar al controlador
         next();
     } catch (error) {
         return res.status(500).json({ error: error.message });
