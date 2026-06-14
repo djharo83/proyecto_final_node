@@ -7,12 +7,12 @@ GET http://localhost:3000/api/favorites/3
 
 ### Crear una nuevo favorito
 POST http://localhost:3000/api/favorites
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMzc1OTU4LCJleHAiOjE3ODE0NjIzNTh9.ECPr-9aoO-vb8uVDF90PQ_abyVCMIDkheoNERd3qJ7c
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTQ1NjE2MSwiZXhwIjoxNzgxNTQyNTYxfQ.TjtPoGHVvl48NgSiI34qAuA11kc1SuEZjqHx-q9v6dI
 Content-Type: application/json
 
 {
-  "user_id": 16,
-  "article_id": 5
+  "user_id": "16",
+  "article_id": "5"
 }
 
 ### Eliminar un favorito existente

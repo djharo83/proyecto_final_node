@@ -25,13 +25,13 @@ const get = async (req, res, next) => {
 
 const getAllFavoritesUser = async (req, res, next) => {
   
-  const { id : userId } = req.user; // Assuming id is available in req.user. after authentication toma el id de req.user y lo asigna a userId
+  const { id : userId } = req.user;
 
   try {
     
     const favoritesUser = await favorites.selectFavoritesUser(userId);
     
-    return res.status(StatusCodes.OK).json({ favoritesUsers: favoritesUser });
+    return res.status(StatusCodes.OK).json({ results: favoritesUser });
   
   } catch (error) {
     next(error);
