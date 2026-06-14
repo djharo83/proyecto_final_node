@@ -29,24 +29,8 @@ const getAllArticles = async (req, res) => {
     }
 };
 
-// 2. Controlador para la Landing Page
-const getLandingArticles = async (req, res) => {
-    try {
-        // Obtenemos simplemente los 10 últimos publicados, sin filtros
-        // Le pasamos la página 1, límite 10, y un objeto de filtros vacío
-        const articles = await ArticlesModel.getAll(1, 10, {});
-        
-        res.json({
-            message: "Artículos recientes para la Landing",
-            results: articles
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
 
-
-// 3. Obtener un artículo por su ID con sus fotos
+// 2. Obtener un artículo por su ID con sus fotos
 const getArticleById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -62,7 +46,7 @@ const getArticleById = async (req, res) => {
     }
 };
 
-// 4. Obtener los artículos del usuario logueado
+// 3. Obtener los artículos del usuario logueado
 const getMyArticles = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -84,7 +68,7 @@ const getMyArticles = async (req, res) => {
 };
 
 
-// 5. Crear un artículo subiendo imágenes a Cloudinary (Protegido contra suplantación)
+// 4. Crear un artículo subiendo imágenes a Cloudinary (Protegido contra suplantación)
 const createArticle = async (req, res) => {
     try {
         // Quitamos user_id del req.body
@@ -110,7 +94,7 @@ const createArticle = async (req, res) => {
 };
 
 
-// 6. Controlador para editar todo el artículo (PUT)
+// 5. Controlador para editar todo el artículo (PUT)
 const updateArticle = async (req, res) => {
     try {
         const { id } = req.params;
@@ -131,7 +115,7 @@ const updateArticle = async (req, res) => {
     }
 };
 
-// 7. Controlador para cambiar solo el estado/status (PATCH)
+// 6. Controlador para cambiar solo el estado/status (PATCH)
 const updateArticleStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -157,7 +141,7 @@ const updateArticleStatus = async (req, res) => {
 };
 
 
-// 8. Eliminar un artículo y sus fotos asociadas
+// 7. Eliminar un artículo y sus fotos asociadas
 const deleteArticle = async (req, res) => {
     try {
         const { id } = req.params;
@@ -174,7 +158,6 @@ const deleteArticle = async (req, res) => {
 };
 
 module.exports = { getAllArticles, 
-                   getLandingArticles, 
                    getArticleById, 
                    getMyArticles,
                    createArticle, 

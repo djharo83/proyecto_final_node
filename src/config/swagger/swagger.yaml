@@ -5,16 +5,6 @@ info:
   description: Documentación de los endpoints del backend en Node.js
 
 paths:
-  /api/articles/landing:
-    get:
-      summary: Obtiene los artículos recientes para la Landing Page
-      description: Devuelve los 10 últimos artículos publicados sin necesidad de filtros (para la portada).
-      tags:
-        - Artículos
-      responses:
-        200:
-          description: Lista de artículos recientes obtenida con éxito.
-
   /api/articles/user/me:
     get:
       summary: Obtiene todos los artículos del usuario logueado

@@ -1,7 +1,6 @@
 const router = require('express').Router();
 
 const { getAllArticles, 
-        getLandingArticles, 
         getArticleById, 
         getMyArticles, 
         createArticle, 
@@ -23,7 +22,6 @@ const { articleSchema, statusSchema } = require('../../schemas/articles.schema')
 
 // RUTAS PÚBLICAS 
 router.get('/', getAllArticles);
-router.get('/landing', getLandingArticles);
 router.get('/user/me', checkToken, getMyArticles);
 router.get('/:id', checkArticleId,getArticleById);
 
