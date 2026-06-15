@@ -58,7 +58,7 @@ paths:
             type: string
 
       responses:
-        200:
+        '200':
           description: Lista de artículos y metadatos de paginación devueltos con éxito.
           content:
             application/json:
@@ -125,16 +125,12 @@ paths:
                           type: string
                           format: date-time
                           example: "2026-06-09T20:00:00Z"
-        500:
+        '500':
           description: Error interno del servidor.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Error de conexión con la base de datos"
+                $ref: '#/components/schemas/500InternalServerErrorResponse'
     post:
       summary: Crea un nuevo artículo con imágenes
       tags:
@@ -200,7 +196,7 @@ paths:
                     type: string
                     format: binary
       responses:
-        201:
+        '201':
           description: Artículo creado.
 
   /api/articles/{id}:
@@ -215,7 +211,7 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: Artículo obtenido.
     delete:
       summary: Elimina un artículo por su ID
@@ -228,8 +224,18 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: Eliminado.
+
+  /api/categories/landing:
+    get:
+      summary: Obtiene todas las categorías para la página de inicio
+      description: Devuelve todas las categorías disponibles para mostrarlas en la página de inicio.
+      tags:
+        - Categorías
+      responses:
+        '200':
+          description: Lista de categorías obtenida con éxito.
 
   /api/categories:
     get:
@@ -237,10 +243,12 @@ paths:
       tags:
         - Categorías
       responses:
-        200:
+        '200':
           description: Lista de categorías obtenida con éxito.
     post:
       summary: Crea una nueva categoría
+      security:
+        - bearerAuth: []
       tags:
         - Categorías
       requestBody:
@@ -262,7 +270,7 @@ paths:
                   minLength: 1
                   example: "new-category"
       responses:
-        201:
+        '201':
           description: Categoría creada con éxito.
 
   /api/categories/{id}:
@@ -277,10 +285,12 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: Categoría encontrada.
     put:
       summary: Actualiza una categoría por su ID
+      security:
+        - bearerAuth: []
       tags:
         - Categorías
       parameters:
@@ -310,10 +320,12 @@ paths:
                   description: Nuevo slug de la categoría
                   example: "update-category"
       responses:
-        200:
+        '200':
           description: Actualizado.
     delete:
       summary: Elimina una categoría por su ID
+      security:
+        - bearerAuth: []
       tags:
         - Categorías
       parameters:
@@ -323,19 +335,35 @@ paths:
           schema:
             type: integer
       responses:
-        200:
-          description: Eliminado.
+        '200':
+          description: Categoría eliminada exitosamente.
 
-  /api/favorites:
+  /api/favorites/user:
     get:
-      summary: Obtiene todos los favoritos
+      summary: Obtiene todos los favoritos de un usuario autenticado
+      security:
+        - bearerAuth: []
       tags:
         - Favoritos
       responses:
-        200:
-          description: Lista de favoritos.
+        '200':
+          description: Lista de artículos favoritos con su categoria e imagenes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesArticleResponse'
+        '500':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/500InternalServerErrorResponse'
+                
+  /api/favorites:
     post:
       summary: Añade un elemento a favoritos
+      security:
+        - bearerAuth: []
       tags:
         - Favoritos
       requestBody:
@@ -357,7 +385,7 @@ paths:
                   description: ID del artículo que se añade como favorito
                   example: 3
       responses:
-        201:
+        '201':
           description: Favorito Creado.
 
   /api/favorites/{id}:
@@ -372,10 +400,12 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: Favorito obtenido.
     delete:
       summary: Elimina un favorito por su ID
+      security:
+        - bearerAuth: []
       tags:
         - Favoritos
       parameters:
@@ -385,7 +415,7 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        '200':
           description: Eliminado.
 
   /api/users:
@@ -394,7 +424,7 @@ paths:
       tags:
         - Usuarios
       responses:
-        200:
+        '200':
           description: Listado obtenido.
 
   /api/users/register:
@@ -420,7 +450,7 @@ paths:
                 password:
                   type: string
       responses:
-        201:
+        '201':
           description: Registrado.
 
   /api/users/login:
@@ -443,7 +473,7 @@ paths:
                 password:
                   type: string
       responses:
-        200:
+        '200':
           description: Token generado.
 
   /api/users/profile:
@@ -469,10 +499,10 @@ paths:
                 avatar_url:
                   type: string
       responses:
-        200:
+        '200':
           description: Actualizado.
 
-# Componente de seguridad
+# Componentes
 components:
   securitySchemes:
     bearerAuth:
@@ -480,3 +510,87 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: Introduce tu token JWT sin la palabra 'Bearer'. Solo el texto del token.
+
+  ## Schemas de respuesta
+
+  schemas:
+    FavoritesArticleResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              favoriteId:
+                type: integer
+                example: 22
+              favoriteUserId:
+                type: integer
+                example: 16
+              favoriteArticleId:
+                type: integer
+                example: 1
+              articleId:
+                type: integer
+                example: 1
+              ownerArticleId:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: iPhone 13 Pro
+              price:
+                type: string
+                example: '650.00'
+              condition:
+                type: string
+                example: Como nuevo
+              status:
+                type: string
+                example: Publicado
+              location:
+                type: string
+                example: Alicante
+              category:
+                $ref: '#/components/schemas/CategoryResponse'
+              photos:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhotosResponse'
+
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Electrónica
+        slug:
+          type: string
+          example: electronica
+
+    PhotosResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 18
+        url:
+          type: string
+          format: uri
+          example: https://res.cloudinary.com/demo/image/upload/iphone.jpg
+        order:
+          type: integer
+          example: 0
+
+    ## Respuestas de error
+
+    500InternalServerErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error de conexión con la base de datos"

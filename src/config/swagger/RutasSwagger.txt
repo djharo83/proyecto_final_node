@@ -1,2 +1,0 @@
-http://localhost:3000/api-docs/
-https://proyecto-final-node-five.vercel.app/api-docs
