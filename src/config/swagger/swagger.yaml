@@ -358,6 +358,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/500InternalServerErrorResponse'
+                
+  /api/favorites:
     post:
       summary: Añade un elemento a favoritos
       security:
