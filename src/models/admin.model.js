@@ -49,4 +49,28 @@ const updateById = async (userId, body) => {
     return result;
 }
 
-module.exports = { selectAll, selectById, updateRole, updateStatus, deleteById, updateById };
+const getStats = async () => {
+    const [articulosPublicados] = await db.query(
+        "SELECT COUNT(*) AS total FROM articles WHERE status = 'Publicado'"
+    );
+    const [usuariosActivos] = await db.query(
+        "SELECT COUNT(*) AS total FROM users WHERE status = 'Activo'"
+    );
+    const [reportesGestionados] = await db.query(
+        "SELECT COUNT(*) AS total FROM reports WHERE status = 'Resuelto'"
+    );
+    const [articulosVendidos] = await db.query(
+        "SELECT COUNT(*) AS total FROM articles WHERE status = 'Vendido'"
+    );
+
+    return {
+        articulosPublicados: articulosPublicados[0].total,
+        usuariosActivos: usuariosActivos[0].total,
+        reportesGestionados: reportesGestionados[0].total,
+        articulosVendidos: articulosVendidos[0].total
+    };
+}
+
+
+
+module.exports = { selectAll, selectById, updateRole, updateStatus, deleteById, updateById,getStats };

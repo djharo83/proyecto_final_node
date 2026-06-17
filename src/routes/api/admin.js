@@ -1,12 +1,13 @@
 const router = require('express').Router();
 const {
-    getAllUsers, getUserById, editUser, changeRole, blockUser, unblockUser, removeUser
+    getAllUsers, getUserById, editUser, changeRole, blockUser, unblockUser, removeUser, getStats
 } = require('../../controllers/admin.controller');
 
 const { checkToken, checkRole } = require('../../middlewares/auth.middleware');
 
 router.use(checkToken, checkRole(['Administrador']));
 
+router.get('/stats',              getStats);
 router.get('/users',              getAllUsers);
 router.get('/users/:userId',      getUserById);
 router.put('/users/:userId',      editUser);

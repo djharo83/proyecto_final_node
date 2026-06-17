@@ -95,5 +95,14 @@ const editUser = async (req, res) => {
     res.json(userActualizado);
 }
 
+const getStats = async (req, res) => {
+    try {
+        const stats = await AdminModel.getStats();
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ message: 'Hay un error gravísimo' });
+    }
+}
 
-module.exports = { getAllUsers, getUserById, changeRole, blockUser, unblockUser, removeUser, editUser };
+
+module.exports = { getAllUsers, getUserById, changeRole, blockUser, unblockUser, removeUser, editUser, getStats };

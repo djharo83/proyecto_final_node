@@ -73,3 +73,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoi
 DELETE http://localhost:3000/api/admin/users/13
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+
+### Panel Admin
+GET http://localhost:3000/api/admin/stats
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcyNTg2OSwiZXhwIjoxNzgxNzI5NDY5fQ.zOOS-jmByZAf__LZ1tslPMBUiI8UlO0c4-eky07YOgo
