@@ -1,33 +1,17 @@
-const UserModel = require('../models/users.model');
+
 const ReportModel = require('../models/reports.model');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-
-// devuelve todos los usuarios
 const getAll = async (req, res) => {
     try {
-        const clientes = await UserModel.selectAll();
-        res.json(clientes);
-    } catch(error){
+        const reports = await ReportModel.selectAll();
+        res.json(reports);
+    } catch (error) {
         res.status(500).json({
-            message: 'Hay un error gravvisimo'
+            message: 'Hay un error gravísimo'
         });
     }
 }
 
-// edita los datos de un mismo usuario pasandole el token
-const edit = async (req, res) => {
-    // El userId viene del token, no de la URL
-    const userId = req.user.id;
-
-    await UserModel.updateById(userId, req.body);
-    const usuario = await UserModel.selectById(userId);
-
-    res.json(usuario);
-}
-
-// crear un report
 const create = async (req, res) => {
     const { type, article_id, reported_user_id, reason } = req.body;
 
@@ -71,8 +55,4 @@ const create = async (req, res) => {
     res.status(201).json(report);
 }
 
-
-
-module.exports = {
-    getAll, edit,create
-}
+module.exports = { getAll, create };

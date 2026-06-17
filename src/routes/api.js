@@ -6,7 +6,9 @@ router.use('/favorites', require('./api/favorites'));
 
 // Ruta Jose 
 router.use('/users',require('./api/users'));
-router.use('/landing', require('./api/loginregistro'))
+router.use('/reports', require('./api/reports'));
+router.use('/admin', require('./api/admin'));
+
 
 
 // Ruta Adrián:
