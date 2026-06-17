@@ -58,4 +58,9 @@ const selectById = async (id) => {
   return result[0] || null;
 };
 
-module.exports = { selectFavoritesUser, insert, selectById, deleteById };
+const getFavoriteByUserIdAndArtcleId = async(user_id, article_id) => {
+  const [result] = await db.query("SELECT * FROM favorites WHERE user_id = ? and article_id = ?", [user_id, article_id]);
+  return result[0] || null;
+};
+
+module.exports = { selectFavoritesUser, insert, selectById, deleteById, getFavoriteByUserIdAndArtcleId };
