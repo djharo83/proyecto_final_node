@@ -5,58 +5,51 @@ info:
   description: Documentación de los endpoints del backend en Node.js
 
 paths:
+  /api/articles/user/me:
+    get:
+      summary: Obtiene todos los artículos del usuario logueado
+      description: Devuelve el inventario completo (publicados, vendidos, borradores) del usuario autenticado.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Listado de los artículos del usuario obtenido con éxito.
+        403:
+          description: Token no proporcionado o incorrecto.
 
   /api/articles:
     get:
       summary: Obtiene todos los artículos con paginación y filtros
-      description: Retorna una lista paginada de artículos que están en estado 'Publicado', permitiendo filtrar por categoría, rango de precios y estado/condición.
+      description: Retorna una lista paginada de artículos. Por defecto muestra los de estado 'Publicado', pero permite filtrar por categoría, precio, estado de conservación, texto y estado del ciclo de vida.
       tags:
         - Artículos
       parameters:
-        # --- PARÁMETROS DE PAGINACIÓN ---
         - name: page
           in: query
-          description: Número de la página que se quiere recuperar.
-          required: false
-          schema:
-            type: integer
-            default: 1
+          schema: { type: integer, default: 1 }
         - name: pageSize
           in: query
-          description: Cantidad de artículos por página.
-          required: false
-          schema:
-            type: integer
-            default: 10
-
-        # --- PARÁMETROS DE FILTRADO ---
+          schema: { type: integer, default: 10 }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: filterStatus
+          in: query
+          schema: { type: string, enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido'] }
         - name: category_id
           in: query
-          description: Filtrar por el ID de la categoría.
-          required: false
-          schema:
-            type: integer
+          schema: { type: integer }
         - name: min_price
           in: query
-          description: Precio mínimo del artículo.
-          required: false
-          schema:
-            type: number
-            format: float
+          schema: { type: number, format: float }
         - name: max_price
           in: query
-          description: Precio máximo del artículo.
-          required: false
-          schema:
-            type: number
-            format: float
+          schema: { type: number, format: float }
         - name: condition
           in: query
-          description: Estado físico del artículo (ej. 'Nuevo', 'Usado').
-          required: false
-          schema:
-            type: string
-
+          schema: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'] }
       responses:
         '200':
           description: Lista de artículos y metadatos de paginación devueltos con éxito.
@@ -131,70 +124,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/500InternalServerErrorResponse'
+
     post:
       summary: Crea un nuevo artículo con imágenes
+      description: Requiere token de autenticación. El user_id se extrae automáticamente del token.
       tags:
         - Artículos
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               type: object
-              required:
-                - title
-                - price
-                - user_id
-                - category_id
+              required: [title, price, category_id, condition, location]
               properties:
-                user_id:
-                  type: integer
-                  example: 1
-                  description: ID del usuario que publica el artículo
-                category_id:
-                  type: integer
-                  example: 1
-                  description: ID de la categoría a la que pertenece
-                title:
-                  type: string
-                  example: "Teclado Gaming Razer"
-                description:
-                  type: string
-                  example: "Teclado mecanico RGB"
-                price:
-                  type: number
-                  format: float
-                  example: 89.99
-                condition:
-                  type: string
-                  description: Condición del artículo que se va a publicar
-                  enum:
-                    - 'Nuevo'
-                    - 'Como nuevo'
-                    - 'Buen estado'
-                    - 'Aceptable'
-                  example: "Nuevo"
-                location:
-                  type: string
-                  example: "Alicante"
-                status:
-                  type: string
-                  description: Estado actual del artículo en la plataforma
-                  enum:
-                    - 'Borrador'
-                    - 'Publicado'
-                    - 'En revisión'
-                    - 'Retirado'
-                    - 'Vendido'
-                    - 'Reservado'
-                  example: "Publicado"
-                  default: 'Publicado'
+                category_id: { type: integer, example: 1 }
+                title: { type: string, example: "Teclado Gaming Razer" }
+                description: { type: string, example: "Teclado mecanico RGB" }
+                price: { type: number, format: float, example: 89.99 }
+                condition: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], example: "Nuevo" }
+                location: { type: string, example: "Alicante" }
                 images:
                   type: array
-                  description: Selecciona hasta 5 archivos de imagen
-                  items:
-                    type: string
-                    format: binary
+                  items: { type: string, format: binary }
       responses:
         '201':
           description: Artículo creado.
@@ -208,24 +162,85 @@ paths:
         - in: path
           name: id
           required: true
-          schema:
-            type: integer
+          schema: { type: integer }
       responses:
         '200':
           description: Artículo obtenido.
-    delete:
-      summary: Elimina un artículo por su ID
+
+    put:
+      summary: Edita un artículo completo
+      description: Modifica los datos principales. Solo el propietario puede hacerlo.
       tags:
         - Artículos
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
-          schema:
-            type: integer
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, price, condition, category_id, location]
+              properties:
+                title: { type: string, example: "Bicicleta mejorada" }
+                description: { type: string, example: "Suspensión nueva." }
+                price: { type: number, format: float, example: 220.00 }
+                condition: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], example: "Buen estado" }
+                category_id: { type: integer, example: 3 }
+                location: { type: string, example: "Madrid" }
       responses:
-        '200':
-          description: Eliminado.
+        200:
+          description: Artículo actualizado exitosamente.
+
+    delete:
+      summary: Elimina un artículo por su ID
+      description: Solo el propietario del artículo puede eliminarlo.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        200:
+          description: Artículo eliminado exitosamente.
+
+  /api/articles/{id}/status:
+    patch:
+      summary: Cambia el estado de un artículo (Ej. Marcar como Vendido)
+      description: Permite al propietario actualizar la fase del ciclo de vida del artículo.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido']
+                  example: "Vendido"
+      responses:
+        200:
+          description: Estado actualizado con éxito.
 
   /api/categories/landing:
     get:

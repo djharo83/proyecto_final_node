@@ -1,8 +1,22 @@
+
+//Usuario id 16, rol Moderador
+@TOKEN_MODERADOR=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjgyOTc3LCJleHAiOjE3ODEzNjkzNzd9.xiE-S6OHXdc4w-jSGnEz160iI-h-mE5xqqzAWWvzYVw
+### dueno@gmail.com  
+### 123
+##Usuario id 23, rol Usuario
+@TOKEN_USER=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIzLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTI4NDQ0NywiZXhwIjoxNzgxMzcwODQ3fQ.rySeIP2rRUA9KDuDBosYOIAQBRfgkEErivVNnNJu50Q
+
+
+
+
 ### 1. Obtener primera página (Por defecto trae 10 artículos)
 GET http://localhost:3000/api/articles
 
 ### 2. Obtener segunda página (Si hay 12 en la DB, aquí debería traer solo 2)
 GET http://localhost:3000/api/articles?page=3
+
+###
+GET http://localhost:3000/api/articles?page=1&pageSize=100
 
 ### 3. Filtrar por Categoría: Electrónica (category_id = 1)
 GET http://localhost:3000/api/articles?category_id=1
@@ -47,6 +61,124 @@ curl -X POST http://localhost:3000/api/articles \
 
 ### 13. Eliminar un artículo por ID (Prueba con un ID de los que hayas creado)
 DELETE http://localhost:3000/api/articles/12
-
+Authorization: {{TOKEN_USER}}
 ###
 GET http://localhost:3000/api/articles/34
+
+### ------------------------------------------------
+## Nuevas peticiones despues de reunión back del miercoles 10 de junio 2026
+### Búsqueda genérica (Palabra clave en título o descripción)
+GET http://localhost:3000/api/articles?search=alfombra
+
+### Búsqueda combinada: Palabra clave + Estado (Solo los teclados que estén publicados)
+GET http://localhost:3000/api/articles?search=teclado&filterStatus=Publicado
+
+### Landing Page (Los 10 últimos artículos sin filtros)
+GET http://localhost:3000/api/articles/landing
+
+### =================================================================
+### PRUEBAS DE SEGURIDAD (Dueño vs Intruso)
+### =================================================================
+
+@tokenOwner = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+@tokenIntruso = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjI1LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTI5MTM2NiwiZXhwIjoxNzgxMzc3NzY2fQ._EuUFCLg3We_-aFEOyk0Qrjh1NQfhw9ZNH0chHTiZyk
+@articleIdToTest = 44
+
+### 1. Login de Ignacio30 (Dueño)
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "Ignacio30@gmail.com",
+    "password": "chorizo"
+}
+
+### 2. Login de Admin (Intruso)
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "admin@gmail.com",
+    "password": "123"
+}
+
+### 3. Intento de borrado por el INTRUSO (Debe devolver 403 Forbidden)
+DELETE http://localhost:3000/api/articles/{{articleIdToTest}}
+Authorization: Bearer {{tokenIntruso}}
+
+### 4. Borrado definitivo por el DUEÑO (Debe devolver 200 OK)
+DELETE http://localhost:3000/api/articles/{{articleIdToTest}}
+Authorization: Bearer {{tokenOwner}}
+
+### Obtener mis propios artículos (Logueado como Ignacio30)
+GET http://localhost:3000/api/articles/user/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+
+
+
+###  EDITAR un artículo (PUT) - Cambiamos título y precio
+### condition: {Como nuevo, Nuevo, Buen estado}
+PUT http://localhost:3000/api/articles/45
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "title": "Teclado Razer Modificado",
+  "description": "Descripción actualizada mediante PUT",
+  "price": 75.00,
+  "condition": "Como nuevo",
+  "location": "Alicante"
+}
+
+
+### 2. MARCAR COMO VENDIDO (PATCH) - Solo modificamos el estado del artículo
+### status: {Borrador, Publicado, En revision, Retirado, Vendido}
+PATCH http://localhost:3000/api/articles/45/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+Content-Type: application/json
+
+{
+  "status": "Vendido"
+}
+
+
+### =================================================================
+### PRUEBAS DE VALIDACIÓN Y SEGURIDAD AVANZADA (YUP Y MIDDLEWARES)
+### =================================================================
+
+### 1. Test de Middleware de ID: Le pasamos texto en vez de número
+### Debe devolver: 400 "El ID del artículo debe ser un número válido"
+GET http://localhost:3000/api/articles/patata
+
+
+### 2. Test de Middleware de ID: Le pasamos un número que no existe
+### Debe devolver: 404 "No existe ningún artículo con ese ID"
+GET http://localhost:3000/api/articles/999999
+
+
+###
+@tokenOwner = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMjkwOTUzLCJleHAiOjE3ODEzNzczNTN9.uRA93uL_eK-8ErmzW01Z4oK5Ju1ztpGRjVszoBBxpxk
+### 3. Test de Yup (Crear): Faltan campos y el precio es negativo
+### Debe devolver: 400 "Error de validación" con el detalle de errores
+POST http://localhost:3000/api/articles
+Authorization: Bearer {{tokenOwner}}
+Content-Type: application/json
+
+{
+  "title": "A", 
+  "description": "Sin categoría, ni ubicación y precio negativo",
+  "price": -50.00,
+  "condition": "Inventado"
+}
+
+
+### 4. Test de Yup (PATCH Status): Estado no válido
+### Debe devolver: 400 y avisar de que "Ese estado del ciclo de vida no existe"
+PATCH http://localhost:3000/api/articles/48/status
+Authorization:  {{tokenOwner}}
+Content-Type: application/json
+
+{
+  "status": "Vendido"
+}

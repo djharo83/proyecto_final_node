@@ -25,6 +25,18 @@ const buildFiltersQuery = (filters) => {
         filterQuery += ` AND a.\`condition\` = ?`; 
         filterParams.push(filters.condition);
     }
+    if (filters.search) {
+        filterQuery += ` AND (a.title LIKE ? OR a.description LIKE ?)`;
+        filterParams.push(`%${filters.search}%`, `%${filters.search}%`);
+    }
+    if (filters.filterStatus) {
+        filterQuery += ` AND a.status = ?`;
+        filterParams.push(filters.filterStatus);
+    }
+    if (filters.user_id) {
+        filterQuery += ` AND a.user_id = ?`;
+        filterParams.push(filters.user_id);
+    }
 
     return { filterQuery, filterParams };
 };
@@ -97,7 +109,39 @@ const create = async (articleData, photoUrls) => {
     return articleId;
 };
 
-// 4. Eliminar artículo y sus fotos asociadas
+
+// 4. Modificar los datos generales de un artículo y devolverlo actualizado
+const updateById = async (id, articleData) => {
+    const { title, description, price, condition, location, category_id } = articleData;
+    
+    // 1. Hacemos la actualización
+    await db.query(
+        `UPDATE articles 
+         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?
+         WHERE id = ?`,
+        [title, description, price, condition, location, category_id, id]
+    );
+    
+    // 2. Retornamos el artículo tal y como está en la BD ahora mismo
+    return await getById(id);
+};
+
+// 5. Cambiar únicamente el estado y devolver el artículo actualizado
+const updateStatus = async (id, status) => {
+    // 1. Actualizamos el estado
+    await db.query(
+        "UPDATE articles SET status = ? WHERE id = ?",
+        [status, id]
+    );
+    
+    // 2. Retornamos el artículo con el cambio
+    return await getById(id);
+};
+
+
+
+
+// 6. Eliminar artículo y sus fotos asociadas
 const deleteById = async (id) => {
     // A. Borramos las fotos asociadas de la tabla secundaria
     await db.query("DELETE FROM article_photos WHERE article_id = ?", [id]);
@@ -116,4 +160,4 @@ const existsArticleById = async(id) => {
 
 }
 
-module.exports = { getAll, getById, create, deleteById, existsArticleById };
+module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById };
