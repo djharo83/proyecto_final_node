@@ -460,13 +460,18 @@ paths:
               properties:
                 username:
                   type: string
+                  example: "carlos_vende"
                 email:
                   type: string
+                  example: "carlos@email.com"
                 password:
                   type: string
+                  example: "Test1234!"
       responses:
         '201':
-          description: Registrado.
+          description: Usuario registrado correctamente.
+        '409':
+          description: El email o el nombre de usuario ya están en uso.
 
   /api/users/login:
     post:
@@ -485,13 +490,39 @@ paths:
               properties:
                 email:
                   type: string
+                  example: "carlos@email.com"
                 password:
                   type: string
+                  example: "Test1234!"
       responses:
         '200':
-          description: Token generado.
+          description: Login correcto, devuelve el token JWT.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login correcto"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Email o contraseña incorrectos.
+        '403':
+          description: La cuenta del usuario está bloqueada.
 
   /api/users/profile:
+    get:
+      summary: Obtiene el perfil del usuario autenticado
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Datos del usuario autenticado.
     put:
       summary: Editar el perfil del usuario autenticado
       tags:
@@ -517,7 +548,311 @@ paths:
         '200':
           description: Actualizado.
 
-# Componentes
+  /api/reports:
+    get:
+      summary: Obtiene todos los reportes
+      description: Solo accesible para Moderador o Administrador.
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Listado de reportes obtenido con éxito.
+        '403':
+          description: Acceso denegado, requiere rol Moderador o Administrador.
+    post:
+      summary: Crear un nuevo reporte (de artículo o de usuario)
+      description: El reporter_id se obtiene automáticamente del token. Si el tipo es 'Articulo' se debe enviar article_id; si es 'Usuario' se debe enviar reported_user_id.
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - reason
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Articulo
+                    - Usuario
+                  example: "Articulo"
+                article_id:
+                  type: integer
+                  description: Obligatorio si type es 'Articulo'.
+                  example: 11
+                reported_user_id:
+                  type: integer
+                  description: Obligatorio si type es 'Usuario'.
+                  example: 10
+                reason:
+                  type: string
+                  example: "El precio parece muy bajo, podría ser fraudulento"
+      responses:
+        '201':
+          description: Reporte creado con éxito.
+        '400':
+          description: Faltan campos obligatorios o se han enviado campos incompatibles con el tipo de reporte.
+
+  /api/admin/stats:
+    get:
+      summary: Estadísticas globales de la plataforma
+      description: Devuelve artículos publicados, usuarios activos, reportes gestionados y artículos vendidos. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Estadísticas obtenidas con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  articulosPublicados:
+                    type: integer
+                    example: 10
+                  usuariosActivos:
+                    type: integer
+                    example: 8
+                  reportesGestionados:
+                    type: integer
+                    example: 2
+                  articulosVendidos:
+                    type: integer
+                    example: 1
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users:
+    get:
+      summary: Obtiene el listado completo de usuarios
+      description: Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Listado de usuarios obtenido con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 7
+                    username:
+                      type: string
+                      example: "laura_moda"
+                    email:
+                      type: string
+                      example: "laura@email.com"
+                    role:
+                      type: string
+                      enum:
+                        - Usuario
+                        - Moderador
+                        - Administrador
+                      example: "Usuario"
+                    status:
+                      type: string
+                      enum:
+                        - Activo
+                        - Bloqueado
+                      example: "Activo"
+                    avg_rating:
+                      type: number
+                      format: float
+                      example: 4.50
+                    location:
+                      type: string
+                      example: "Barcelona"
+                    created_at:
+                      type: string
+                      format: date-time
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}:
+    get:
+      summary: Obtiene un usuario por su ID
+      description: Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: Usuario encontrado.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+    put:
+      summary: Edita los datos de un usuario
+      description: Permite modificar username, email y location de cualquier usuario. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "pepematias"
+                email:
+                  type: string
+                  example: "pepematias@email.com"
+                location:
+                  type: string
+                  example: "Logroño"
+      responses:
+        '200':
+          description: Usuario actualizado con éxito.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+    delete:
+      summary: Elimina un usuario
+      description: Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: Usuario eliminado correctamente.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/role:
+    put:
+      summary: Cambia el rol de un usuario
+      description: Permite asignar el rol Usuario, Moderador o Administrador. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum:
+                    - Usuario
+                    - Moderador
+                    - Administrador
+                  example: "Moderador"
+      responses:
+        '200':
+          description: Rol actualizado con éxito.
+        '400':
+          description: El rol enviado no es válido.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/block:
+    put:
+      summary: Bloquea la cuenta de un usuario
+      description: Cambia el status del usuario a 'Bloqueado'. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: Usuario bloqueado con éxito.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/unblock:
+    put:
+      summary: Desbloquea la cuenta de un usuario
+      description: Cambia el status del usuario a 'Activo'. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 12
+      responses:
+        '200':
+          description: Usuario desbloqueado con éxito.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
 components:
   securitySchemes:
     bearerAuth:

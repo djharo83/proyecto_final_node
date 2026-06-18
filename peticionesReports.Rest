@@ -1,0 +1,25 @@
+
+
+# reportar articulo
+POST http://localhost:3000/api/reports
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxNDQ4NDgxLCJleHAiOjE3ODE1MzQ4ODF9.VdVhnQygTJbkqIoTloJ-CHig7Diq3sDc0Y2l9x2epAM
+Content-Type: application/json
+
+{
+    "type": "Articulo",
+    "article_id": 11,
+    "reason": "Teclado roto"
+}
+
+# reportar usuario
+###
+POST http://localhost:3000/api/users/reports
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxNDQ4NDgxLCJleHAiOjE3ODE1MzQ4ODF9.VdVhnQygTJbkqIoTloJ-CHig7Diq3sDc0Y2l9x2epAM
+Content-Type: application/json
+
+{
+    "type": "Usuario",
+    "reported_user_id": 5,
+    "article_id":10,
+    "reason": "me intenta estafar por el chat"
+}

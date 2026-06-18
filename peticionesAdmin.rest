@@ -1,0 +1,81 @@
+
+
+### 1. Login como admin
+
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email":"Admin@gmail.com",
+    "password":"chorizo"
+}
+
+### Consultar todos los usuarios
+
+GET http://localhost:3000/api/admin/users
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+
+### Consultar un usuario por id
+GET http://localhost:3000/api/admin/users/3
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+
+### Editar datos de un usuario
+
+PUT http://localhost:3000/api/admin/users/7
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+{
+    "username": "pepepmatias",
+    "email": "pepematias@email.com",
+    "location": "Logroño"
+}
+
+### Cambiar el rol de usuario a Moderador
+
+PUT http://localhost:3000/api/admin/users/7/role
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+{
+    "role": "Moderador"
+}
+
+### Devolverle a ususario
+
+PUT http://localhost:3000/api/admin/users/7/role
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+{  
+    "role": "Usuario"
+}
+
+
+### Bloquear un usuario
+
+PUT http://localhost:3000/api/admin/users/7/block
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+### Desbloquear un usuario
+
+PUT http://localhost:3000/api/admin/users/12/unblock
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+
+
+### Eliminar un usuario
+
+DELETE http://localhost:3000/api/admin/users/7
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+
+###
+
+GET http://localhost:3000/api/admin/stats
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
