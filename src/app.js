@@ -5,7 +5,32 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger/swagger');
 
 const app = express();
-app.use(cors());
+
+// Lista de orígenes permitidos para CORS
+const allowedOrigins = [
+    'http://localhost:4200',                  // Angular local por defecto (ng serve)
+    'http://localhost:4000',                  // Angular local alternativo / SSR
+    'https://tu-proyecto-frontend.onrender.com' // Tu Frontend en producción (sustituir esta url cuando el front este desplegado en Vercel)
+];                                               // **No poner la barra / despues de.com
+
+const corsOptions = {
+    origin: function (dominioEmisor, callback) {
+        // Permitir peticiones sin origen (como Postman, Swagger o herramientas de server-to-server)
+        if (!dominioEmisor) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(dominioEmisor) !== -1) {
+            callback(null, true);
+        } else {
+            // Al pasar (null, false), CORS rechaza la petición limpiamente 
+            // sin generar un error 500 en tu servidor.
+            callback(null, false);
+        }
+    },
+    
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 // Ampliamos limite de imagenes enviadas en el body a 10mb para que no pete al subir fotos en Base64
 app.use(express.json({ limit: '10mb' })); 
@@ -15,38 +40,18 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Ex.
 app.use('/api', require('./routes/api'));
 
-//Detectamos el entorno para configurar Swagger de forma adecuada (en Vercel no podemos servir archivos estáticos, así que le decimos a Swagger que cargue los suyos desde CDN)
-const IS_VERCEL = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
-
-let swaggerOptions = {
-    explorer: true,
-    swaggerOptions: {
-        url: '/api-docs/swagger.json' // Le da una ruta fija al JSON para que no use scripts internos rotos
-    }
+// --- CONFIGURACIÓN DE SWAGGER SIMPLIFICADA PARA RENDER ---
+const swaggerOptions = {
+    explorer: true
 };
 
-if (IS_VERCEL) {
-    swaggerOptions = {
-        ...swaggerOptions,
-        customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css",
-        customJs: [
-            "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js",
-            "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js"
-        ]
-    };
-}
-
-// Endpoint para servir el JSON que necesita el explorador de Swagger
-app.get('/api-docs/swagger.json', (req, res) => {
-    res.json(swaggerSpec);
-});
-
-// La ruta principal que ahora será infalible
+// La ruta principal de la documentación se configura directamente con el objeto 'swaggerSpec'
 app.use(
     '/api-docs', 
     swaggerUi.serve, 
     swaggerUi.setup(swaggerSpec, swaggerOptions)
 );
+// --- FIN CONFIGURACIÓN SWAGGER ---
 
 // 404 handler
 app.use((req, res, next) => {
@@ -55,7 +60,7 @@ app.use((req, res, next) => {
     });
 });
 
-// Error handler
+// 500 Error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ message: err.message });

@@ -152,4 +152,12 @@ const deleteById = async (id) => {
     return result.affectedRows > 0;
 };
 
-module.exports = { getAll, getById, updateById, updateStatus, create, deleteById };
+const existsArticleById = async(id) => {
+
+    const [rows] = await db.query("SELECT EXISTS(SELECT 1 FROM articles WHERE id = ?) AS existe", [id]);
+
+    return Boolean(rows[0].existe);
+
+}
+
+module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById };

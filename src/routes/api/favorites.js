@@ -1,40 +1,14 @@
 const router = require("express").Router();
 
+const {checkToken} = require ('../../middlewares/auth.middleware')
+const { favoritesSchema } = require('../../schemas/favorites.schema'); 
+const { validateSchema } = require('../../middlewares/validation.middleware'); 
+
 const favoritesController = require("../../controllers/favorites.controller");
 
-/**
- * @openapi
- * /api/favorites/{id}:
- *   get:
- *     summary: Obtiene un favorito por su ID
- *     description: Retorna los detalles de un favorito específico basado en su ID.
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de la favorito a buscar
- *     responses:
- *       200:
- *         description: Favorito encontrado con éxito.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 name:
- *                   type: string
- *                   example: "Tecnología"
- *     tags:
- *       - Favoritos
- */
+router.get("/user", checkToken, favoritesController.getAllFavoritesUser);
 router.get("/:id", favoritesController.get);
-router.get("/", favoritesController.getAll);
-router.post("/", favoritesController.create);
-router.delete("/:id", favoritesController.remove);
+router.post("/", checkToken, validateSchema(favoritesSchema), favoritesController.create);
+router.delete("/:id", checkToken, favoritesController.remove);
 
 module.exports = router;

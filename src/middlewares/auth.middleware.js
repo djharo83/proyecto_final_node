@@ -69,6 +69,4 @@ const isOwner = async (req, res, next) => {
     }
 };
 
-
-
 module.exports = { checkToken, checkRole, isOwner }
