@@ -1,11 +1,15 @@
 ### Obtener todas las categories
 GET http://localhost:3000/api/categories/
 
+### Obtener todas las categories para la landing page
+GET http://localhost:3000/api/categories/landing
+
 #### Obtener category por ID
 GET http://localhost:3000/api/categories/1
 
 ### Crear una nueva category
 POST http://localhost:3000/api/categories
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTQ1NjE2MSwiZXhwIjoxNzgxNTQyNTYxfQ.TjtPoGHVvl48NgSiI34qAuA11kc1SuEZjqHx-q9v6dI
 Content-Type: application/json
 
 {
@@ -16,6 +20,7 @@ Content-Type: application/json
 
 ### Actualizar una category existente
 PUT http://localhost:3000/api/categories/14
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMzc1OTU4LCJleHAiOjE3ODE0NjIzNTh9.ECPr-9aoO-vb8uVDF90PQ_abyVCMIDkheoNERd3qJ7c
 Content-Type: application/json
 
 {
@@ -24,4 +29,5 @@ Content-Type: application/json
 }
 
 ### Eliminar una category existente
-DELETE http://localhost:3000/api/categories/14
+DELETE http://localhost:3000/api/categories/16
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTQ1MDQ5MSwiZXhwIjoxNzgxNTM2ODkxfQ.IJo8P-GTHNO2DO8FpXnYd6lhTzUc3WAANMQSm50eAM8

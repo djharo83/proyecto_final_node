@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/users.model');
+const ArticlesModel = require('../models/articles.model');
+
 
 const checkToken = async (req, res, next) => {
     // ¿Está el token en la cabecera?
@@ -52,4 +54,19 @@ const checkRole = (roles) => {
     }
 }
 
-module.exports = { checkToken, checkRole }
+// Comprueba si el usuario autenticado es el creador del artículo
+const isOwner = async (req, res, next) => {
+    try {
+        // Como 'checkArticleId' se ejecutará justo antes en la ruta, ya tenemos el artículo aquí:
+        const article = req.article; 
+
+        if (article.user_id !== req.user.id) {
+            return res.status(403).json({ message: 'Acceso denegado: No eres el propietario de este artículo' });
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { checkToken, checkRole, isOwner }
