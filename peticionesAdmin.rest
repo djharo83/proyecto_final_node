@@ -14,7 +14,7 @@ Content-Type: application/json
 
 GET http://localhost:3000/api/admin/users
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
 
 
 ### Consultar un usuario por id
@@ -24,21 +24,21 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoi
 
 ### Editar datos de un usuario
 
-PUT http://localhost:3000/api/admin/users/3
+PUT http://localhost:3000/api/admin/users/7
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
 
 {
-    "username": "pedro_actualizado",
-    "email": "pedro66@email.com",
+    "username": "pepepmatias",
+    "email": "pepematias@email.com",
     "location": "Logroño"
 }
 
 ### Cambiar el rol de usuario a Moderador
 
-PUT http://localhost:3000/api/admin/users/12/role
+PUT http://localhost:3000/api/admin/users/7/role
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
 
 {
     "role": "Moderador"
@@ -46,20 +46,20 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoi
 
 ### Devolverle a ususario
 
-PUT http://localhost:3000/api/admin/users/12/role
+PUT http://localhost:3000/api/admin/users/7/role
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
 
-{
+{  
     "role": "Usuario"
 }
 
 
 ### Bloquear un usuario
 
-PUT http://localhost:3000/api/admin/users/12/block
+PUT http://localhost:3000/api/admin/users/7/block
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
 
 ### Desbloquear un usuario
 
@@ -70,10 +70,12 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoi
 
 ### Eliminar un usuario
 
-DELETE http://localhost:3000/api/admin/users/13
+DELETE http://localhost:3000/api/admin/users/7
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcxOTY4NCwiZXhwIjoxNzgxNzIzMjg0fQ.EpZzxMrIg0RgqdqPFr9oVYx5-73-iRiwNuJnveguvV8
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
 
-### Panel Admin
+
+###
+
 GET http://localhost:3000/api/admin/stats
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTcyNTg2OSwiZXhwIjoxNzgxNzI5NDY5fQ.zOOS-jmByZAf__LZ1tslPMBUiI8UlO0c4-eky07YOgo
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
