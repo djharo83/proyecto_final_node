@@ -1,17 +1,18 @@
 const router = require('express').Router();
 
-// Ruta Diego
+// Rutas Diego
 router.use('/categories', require('./api/categories'));
 router.use('/favorites', require('./api/favorites'));
 
-// Ruta Jose 
+// Rutas Jose 
 router.use('/users',require('./api/users'));
+//Rutas Jose/Diego
 router.use('/reports', require('./api/reports'));
+//Rutas Jose 
 router.use('/admin', require('./api/admin'));
 
 
-
-// Ruta Adrián:
+// Ruta sAdrián:
 router.use('/articles', require('./api/articles'));
 
 module.exports = router;

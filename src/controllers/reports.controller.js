@@ -1,18 +1,9 @@
 
 const ReportModel = require('../models/reports.model');
 
-const getAll = async (req, res) => {
-    try {
-        const reports = await ReportModel.selectAll();
-        res.json(reports);
-    } catch (error) {
-        res.status(500).json({
-            message: 'Hay un error gravísimo'
-        });
-    }
-}
 
-const create = async (req, res) => {
+// Usuarios 
+const createUserReport = async (req, res) => {
     const { type, article_id, reported_user_id, reason } = req.body;
 
     if (!type || !reason) {
@@ -55,4 +46,28 @@ const create = async (req, res) => {
     res.status(201).json(report);
 }
 
-module.exports = { getAll, create };
+// Moderador
+
+const getReportsPendingArticles = async (req, res) => {
+    try {
+        const reports = await ReportModel.selectAll();
+        res.json(reports);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Hay un error gravísimo'
+        });
+    }
+}
+
+const getReportsPendingUsers = async (req, res) => {
+    try {
+        const reports = await ReportModel.selectAll();
+        res.json(reports);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Hay un error gravísimo'
+        });
+    }
+}
+
+module.exports = { createUserReport, getReportsPendingArticles, getReportsPendingUsers };
