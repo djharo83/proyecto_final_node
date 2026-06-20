@@ -1,0 +1,31 @@
+
+@TOKEN =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTk3MTUxNiwiZXhwIjoxNzgxOTc1MTE2fQ.3u5-9qBwlkdKgOEC8ja4lnbH038SuP2pRs5Dc0o65s0
+
+### LOGIN para obtener Token
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "Ignacio30@gmail.com",
+    "password": "chorizo"
+}
+
+###
+GET http://localhost:3000/api/messages/:1
+Authorization: {{TOKEN}}
+
+### Crear la conversación
+POST http://localhost:3000/api/conversations
+Authorization: {{TOKEN}}
+Content-Type: application/json
+
+{ "article_id": 2 }
+
+### Buzon de mensajes
+GET http://localhost:3000/api/conversations
+Authorization: {{TOKEN}}
+
+
+### Ver los mensaje de la conversación 9
+GET http://localhost:3000/api/messages/9
+Authorization: {{TOKEN}}
