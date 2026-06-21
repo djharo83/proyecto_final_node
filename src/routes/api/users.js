@@ -5,6 +5,7 @@ const {checkToken} = require ('../../middlewares/auth.middleware')
 
 // Acciones que puede hacer un usuario
 
+router.post('/', getAll);
 router.post('/register', register);
 router.post('/login', login);
 router.put('/profile', checkToken, edit); 

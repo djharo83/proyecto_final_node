@@ -152,6 +152,7 @@ const deleteById = async (id) => {
     return result.affectedRows > 0;
 };
 
+// Consulta para favoritos
 const existsArticleById = async(id) => {
 
     const [rows] = await db.query("SELECT EXISTS(SELECT 1 FROM articles WHERE id = ?) AS existe", [id]);
@@ -160,4 +161,20 @@ const existsArticleById = async(id) => {
 
 }
 
-module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById };
+// Moderador
+const updateArticleStatus = async (id, action) => {
+   
+    let query = ''; 
+    
+    if (action === 'accept') {
+        query = `UPDATE articles SET status = 'Retirado', previous_status = NULL WHERE id = ?`;
+    } else if (action === 'reject') {
+        query = `UPDATE articles SET status = previous_status, previous_status = NULL WHERE id = ?`;
+    };
+
+    const [result] = await db.query(query, [id]);
+    
+    return result;
+};
+
+module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById, updateArticleStatus };
