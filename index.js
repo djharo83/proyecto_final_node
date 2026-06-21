@@ -32,22 +32,31 @@ const io = socketIO(server, {
     }
 });
 
+// Eventos socket
+const SOCKET_EVENTS = {
+    CONNECTION: 'connection',
+    DISCONNECT: 'disconnect',
+    JOIN_CHAT: 'join_chat',
+    PRIVATE_MESSAGE: 'private_message',
+    NEW_MESSAGE: 'new_message'
+};
+
+
+
 // Escuchamos el evento de conexión
-io.on('connection', (socket) => {
+io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
     console.log(`Se ha conectado un nuevo cliente: ${socket.id}`);
 
-    // 1. Unirse a la sala de la conversación
-    socket.on('join_chat', (conversationId) => {
+    // 1. Unirse a la sala
+    socket.on(SOCKET_EVENTS.JOIN_CHAT, (conversationId) => {
         const roomName = `room_conversation_${conversationId}`;
         socket.join(roomName);
         console.log(`Usuario unido a la sala: ${roomName}`);
     });
 
     // 2. Recibir mensaje, guardarlo en MySQL y retransmitirlo
-    socket.on('private_message', async (data) => {
-        /* data espera recibir: { conversation_id, sender_id, content } */
+    socket.on(SOCKET_EVENTS.PRIVATE_MESSAGE, async (data) => {
         try {
-            // A. Lo guardamos en la base de datos
             const insertId = await MessagesModel.insert({
                 conversation_id: data.conversation_id,
                 sender_id: data.sender_id,
@@ -59,7 +68,7 @@ io.on('connection', (socket) => {
 
             // C. Lo emitimos SOLO a los que estén en la sala de esta conversación
             const roomName = `room_conversation_${data.conversation_id}`;
-            io.to(roomName).emit('new_message', savedMessage);
+            io.to(roomName).emit(SOCKET_EVENTS.NEW_MESSAGE, savedMessage);
             
         } catch (error) {
             console.error('Error guardando el mensaje en BD:', error);
