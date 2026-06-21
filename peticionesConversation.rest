@@ -1,6 +1,5 @@
 
-@TOKEN =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTk3MTUxNiwiZXhwIjoxNzgxOTc1MTE2fQ.3u5-9qBwlkdKgOEC8ja4lnbH038SuP2pRs5Dc0o65s0
-
+@TOKEN =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjA0MTgzMSwiZXhwIjoxNzgyMDQ1NDMxfQ.yR3PdaJSOM6vEy57CIcUMDSmNpkI5OTDAU18QWKuy7U
 ### LOGIN para obtener Token
 POST http://localhost:3000/api/users/login
 Content-Type: application/json
