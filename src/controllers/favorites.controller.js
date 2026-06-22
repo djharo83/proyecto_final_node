@@ -44,7 +44,7 @@ const create = async (req, res, next) => {
   try {
     
     //Comprobar si el artículo existe
-    const { article_id } = req.body;
+    const { user_id, article_id } = req.body;
     const existsArticle = await articles.existsArticleById(article_id);
 
     if (!existsArticle) {
@@ -53,16 +53,14 @@ const create = async (req, res, next) => {
     }
 
     //comprobar si el favorito ya existe en la tabla
-    const user_id = req.user.id;
-
-    const favoriteExists = favorites.getFavoriteByUserIdAndArtcleId(user_id, article_id);
+    const favoriteExists = await favorites.getFavoriteByUserIdAndArtcleId(user_id, article_id);
 
     if(favoriteExists){
       return res.status(StatusCodes.BAD_REQUEST)
         .json({message: "Este artículo ya está en tu lista de favoritos."});
     }
 
-    const result = await favorites.insert(req.body);
+    const result = await favorites.insert(user_id, article_id);
 
     const insertId = result.insertId || result.insert_id || null;
 

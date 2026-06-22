@@ -8,10 +8,10 @@ const app = express();
 
 // Lista de orígenes permitidos para CORS
 const allowedOrigins = [
-    'http://localhost:4200',                  // Angular local por defecto (ng serve)
-    'http://localhost:4000',                  // Angular local alternativo / SSR
-    'https://tu-proyecto-frontend.onrender.com' // Tu Frontend en producción (sustituir esta url cuando el front este desplegado en Vercel)
-];                                               // **No poner la barra / despues de.com
+    'http://localhost:4200',
+    'http://localhost:4000',
+    'https://unir.c4a.com.co'
+];                                               
 
 const corsOptions = {
     origin: function (dominioEmisor, callback) {

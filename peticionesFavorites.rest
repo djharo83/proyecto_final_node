@@ -11,8 +11,8 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoi
 Content-Type: application/json
 
 {
-  "user_id": "16",
-  "article_id": "5"
+  "user_id": 44,
+  "article_id": 47
 }
 
 ### Eliminar un favorito existente
