@@ -28,8 +28,18 @@ const edit = async (req, res) => {
 }
 
 
+const getById = async (req, res) => {
+    const { userId } = req.params;
+
+    const usuario = await UserModel.selectById(userId);
+    if (!usuario) {
+        return res.status(404).json({ message: 'El usuario no existe con ese ID' });
+    }
+
+    res.json(usuario);
+}
 
 
 module.exports = {
-    getAll, edit
+    getAll, edit , getById
 }

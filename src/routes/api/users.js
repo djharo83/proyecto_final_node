@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {getAll, edit} = require('../../controllers/users.controller')
+const {getAll, edit , getById} = require('../../controllers/users.controller')
 const {register,login} = require('../../controllers/loginregistro.controller')
 const {checkToken} = require ('../../middlewares/auth.middleware')
 
@@ -7,6 +7,8 @@ const {checkToken} = require ('../../middlewares/auth.middleware')
 
 router.post('/register', register);
 router.post('/login', login);
+router.get('/:userId', getById);
+router.get('/', getAll);
 router.put('/profile', checkToken, edit); 
 
 
