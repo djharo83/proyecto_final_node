@@ -13,5 +13,7 @@ router.use('/admin', require('./api/admin'));
 
 // Ruta Adrián:
 router.use('/articles', require('./api/articles'));
+router.use('/messages', require('./api/messages'));
+router.use('/conversations', require('./api/conversations')); 
 
 module.exports = router;
