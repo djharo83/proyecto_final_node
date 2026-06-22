@@ -7,8 +7,8 @@ const {checkToken} = require ('../../middlewares/auth.middleware')
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/:userId', getById);
-router.get('/', getAll);
+router.get('/:userId', checkToken, getById);
+router.get('/', checkToken ,getAll);
 router.put('/profile', checkToken, edit); 
 
 
