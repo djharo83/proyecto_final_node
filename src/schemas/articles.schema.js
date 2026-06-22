@@ -14,7 +14,8 @@ const articleSchema = yup.object().shape({
            .required('El precio es obligatorio'),
     condition: yup
            .string()
-           .oneOf(['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], 'Estado de conservación no válido').required('La condición es obligatoria'),
+           .oneOf(['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], 'Estado de conservación no válido')
+           .required('La condición es obligatoria'),
     category_id: yup
            .number()
            .integer()
@@ -22,7 +23,11 @@ const articleSchema = yup.object().shape({
            .required('La categoría es obligatoria'),
     location: yup
         .string()
-        .required('La ubicación es obligatoria')
+        .required('La ubicación es obligatoria'),
+    photoUrls: yup
+        .array()
+        .of(yup.string())
+        .optional()
 });
 
 const statusSchema = yup.object().shape({
