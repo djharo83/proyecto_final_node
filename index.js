@@ -26,7 +26,7 @@ const io = socketIO(server, {
         origin: [
             'http://localhost:4200',                  
             'http://localhost:4000',                  
-            'https://tu-proyecto-frontend.onrender.com'
+            'https://unir.c4a.com.co'
         ],
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
     }
