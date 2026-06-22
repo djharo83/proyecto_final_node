@@ -548,6 +548,55 @@ paths:
         '200':
           description: Actualizado.
 
+  /api/users/{userId}:
+    get:
+      summary: Obtiene un usuario por su ID
+      description: Devuelve los datos públicos de un usuario concreto.
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: Usuario encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 4
+                  username:
+                    type: string
+                    example: "carlos_vende"
+                  email:
+                    type: string
+                    example: "carlos@email.com"
+                  role:
+                    type: string
+                    example: "Usuario"
+                  status:
+                    type: string
+                    example: "Activo"
+                  avatar_url:
+                    type: string
+                    nullable: true
+                    example: null
+                  location:
+                    type: string
+                    example: "Madrid"
+                  created_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: El usuario no existe con ese ID.
+
   /api/reports:
     get:
       summary: Obtiene todos los reportes
@@ -563,7 +612,12 @@ paths:
           description: Acceso denegado, requiere rol Moderador o Administrador.
     post:
       summary: Crear un nuevo reporte (de artículo o de usuario)
-      description: El reporter_id se obtiene automáticamente del token. Si el tipo es 'Articulo' se debe enviar article_id; si es 'Usuario' se debe enviar reported_user_id.
+      description: |
+        El reporter_id se obtiene automáticamente del token.
+        - Si el tipo es **'Articulo'**: se debe enviar article_id. El artículo reportado cambia automáticamente su status a **'En revisión'** y su status anterior queda guardado en el campo **previous_status** para poder recuperarlo después.
+        - Si el tipo es **'Usuario'**: se debe enviar reported_user_id.
+        No se puede enviar article_id y reported_user_id a la vez.
+
       tags:
         - Reportes
       security:
@@ -597,7 +651,7 @@ paths:
                   example: "El precio parece muy bajo, podría ser fraudulento"
       responses:
         '201':
-          description: Reporte creado con éxito.
+          description: Reporte creado con éxito. Si el tipo es 'Articulo', el artículo pasa automáticamente a 'En revisión'.
         '400':
           description: Faltan campos obligatorios o se han enviado campos incompatibles con el tipo de reporte.
 
