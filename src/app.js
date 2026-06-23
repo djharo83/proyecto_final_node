@@ -8,10 +8,10 @@ const app = express();
 
 // Lista de orígenes permitidos para CORS
 const allowedOrigins = [
-    'http://localhost:4200',           
+    'http://localhost:4200',
     'http://localhost:4000',
     'https://unir.c4a.com.co'
-];                                              
+];                                               
 
 const corsOptions = {
     origin: function (dominioEmisor, callback) {

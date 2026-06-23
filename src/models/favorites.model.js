@@ -40,7 +40,7 @@ GROUP BY ar.id, fv.user_id, fv.article_id, ca.id`, [user_id]);
 
 };
 
-const insert = async ({ user_id, article_id }) => {
+const insert = async (user_id, article_id) => {
   const [result] = await db.query(
     "INSERT INTO favorites (user_id, article_id) VALUES (?, ?)",
     [user_id, article_id],
