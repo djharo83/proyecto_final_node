@@ -127,14 +127,19 @@ const updateById = async (id, articleData) => {
 };
 
 // 5. Cambiar únicamente el estado y devolver el artículo actualizado
-const updateStatus = async (id, status) => {
-    // 1. Actualizamos el estado
+const updateStatus = async (id, newStatus) => {
+
+    // 1. Obtenemos el artículo actual para saber su status antes de cambiarlo
+    const articuloActual = await getById(id);
+    if (!articuloActual) return null;
+
+    // 2. Actualizamos el status nuevo y guardamos el anterior en previous_status
     await db.query(
-        "UPDATE articles SET status = ? WHERE id = ?",
-        [status, id]
+        "UPDATE articles SET previous_status = ?, status = ? WHERE id = ?",
+        [articuloActual.status, newStatus, id]
     );
     
-    // 2. Retornamos el artículo con el cambio
+    // 3. Retornamos el artículo ya actualizado
     return await getById(id);
 };
 

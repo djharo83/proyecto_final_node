@@ -1,5 +1,6 @@
 
 const ReportModel = require('../models/reports.model');
+const ArticleModel = require('../models/articles.model');
 
 const getAll = async (req, res) => {
     try {
@@ -51,6 +52,10 @@ const create = async (req, res) => {
 
     const result = await ReportModel.insert(body);
     const report = await ReportModel.selectById(result.insertId);
+
+    if (type === 'Articulo') {
+            await ArticleModel.updateStatus(article_id, 'En revisión');
+    }
 
     res.status(201).json(report);
 }
