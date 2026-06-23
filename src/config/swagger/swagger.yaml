@@ -388,20 +388,31 @@ paths:
             schema:
               type: object
               required:
-                - user_id
                 - article_id
               properties:
-                user_id:
-                  type: integer
-                  description: ID del usuario que añade el favorito
-                  example: 1
                 article_id:
                   type: integer
                   description: ID del artículo que se añade como favorito
                   example: 3
       responses:
         '201':
-          description: Favorito Creado.
+          description: Información del favorito creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteCreatedeResponse'
+        '400':
+          description: El artículo ya se encuentra en la lista de favoritos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestFavoriteCreatedeResponse'
+        '404':
+          description: El artículo que se quiere añadir a favoritos no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundFavoriteCreatedeResponse'
 
   /api/favorites/{id}:
     get:
@@ -854,6 +865,8 @@ paths:
           description: Acceso denegado, requiere rol Administrador.
 
 components:
+  
+  ## Schema de seguridad
   securitySchemes:
     bearerAuth:
       type: http
@@ -864,6 +877,10 @@ components:
   ## Schemas de respuesta
 
   schemas:
+
+
+  ## Favoritos
+
     FavoritesArticleResponse:
       type: object
       properties:
@@ -908,6 +925,68 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/PhotosResponse'
+
+    FavoriteCreatedeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Favorito creado exitosamente
+        favorite:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 38
+            user_id:
+              type: integer
+              example: 51
+            article_id:
+              type: integer
+              example: 7
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-23T08:27:05.000Z'
+          required:
+            - id
+            - user_id
+            - article_id
+            - created_at
+      required:
+        - message
+        - favorite
+      example:
+        message: Favorito creado exitosamente
+        favorite:
+          id: 38
+          user_id: 51
+          article_id: 7
+          created_at: '2026-06-23T08:27:05.000Z'
+
+    BadRequestFavoriteCreatedeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Este artículo ya está en tu lista de favoritos.
+      required:
+        - message
+      example:
+        message: Este artículo ya está en tu lista de favoritos.
+
+    NotFoundFavoriteCreatedeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: El artículo que intentas guardar en favoritos no existe.
+      required:
+        - message
+      example:
+        message: El artículo que intentas guardar en favoritos no existe.
+
+    ## Categorias
 
     CategoryResponse:
       type: object

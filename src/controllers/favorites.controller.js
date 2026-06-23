@@ -44,13 +44,15 @@ const create = async (req, res, next) => {
   try {
     
     //Comprobar si el artículo existe
-    const { user_id, article_id } = req.body;
+    const {article_id } = req.body;
     const existsArticle = await articles.existsArticleById(article_id);
 
     if (!existsArticle) {
       return res.status(StatusCodes.NOT_FOUND)
         .json({ message: "El artículo que intentas guardar en favoritos no existe." });
     }
+
+    const  user_id = req.user.id;
 
     //comprobar si el favorito ya existe en la tabla
     const favoriteExists = await favorites.getFavoriteByUserIdAndArtcleId(user_id, article_id);
@@ -70,7 +72,7 @@ const create = async (req, res, next) => {
 
     const favorite = await favorites.selectById(insertId);
     
-    return res.status(StatusCodes.CREATED).json({ message: "Favorite creado exitosamente", favorite });
+    return res.status(StatusCodes.CREATED).json({ message: "Favorito creado exitosamente", favorite });
   
   } catch (error) {
     next(error);
