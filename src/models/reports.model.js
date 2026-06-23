@@ -39,7 +39,9 @@ const selectReportPendingArticle = async (report_id) => {
 
     let query = `SELECT 
     r.id AS report_id, r.reason, r.created_at,
-    a.id AS article_id, a.title, a.description, a.price, a.condition, a.location,
+    a.id AS article_id, a.title, a.description, a.price, a.condition,
+    a.location, a.previous_status, a.status,
+    u_seller.id AS seller_id,
     u_seller.username AS seller_username,
 	JSON_ARRAYAGG(
         JSON_OBJECT(
@@ -112,7 +114,6 @@ const selectReportPendingUser = async (report_id) => {
     return result[0] || null;
 }
 
-
 const selectReportsHistory = async () => {
     
     let query = `SELECT 
@@ -134,7 +135,7 @@ const selectReportsHistory = async () => {
     return result;
 }
 
-const updateReport = async (moderator_id, moderator_note, report_id) => {
+const updateReport = async (connection, {moderator_id, moderator_note, report_id}) => {
 
     let query = `UPDATE reports 
             SET status = 'Resuelto',
@@ -143,16 +144,10 @@ const updateReport = async (moderator_id, moderator_note, report_id) => {
                 resolved_at = NOW()
             WHERE id = ?`;
 
-    const [result] = await db.query(query, [moderator_id, moderator_note, report_id]);
+    const [result] = await connection.query(query, [moderator_id, moderator_note, report_id]);
   
     return result;
 
-}
-
-const selectReportById = async (id) => {
-    
-  const [result] = await db.query("SELECT * FROM reports WHERE id = ?", [id]);
-  return result[0] || null;
 }
 
 module.exports = { insert, 

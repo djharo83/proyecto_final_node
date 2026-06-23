@@ -161,20 +161,16 @@ const existsArticleById = async(id) => {
 
 }
 
-// Moderador
-const updateArticleStatus = async (id, action) => {
-   
-    let query = ''; 
-    
-    if (action === 'accept') {
-        query = `UPDATE articles SET status = 'Retirado', previous_status = NULL WHERE id = ?`;
-    } else if (action === 'reject') {
-        query = `UPDATE articles SET status = previous_status, previous_status = NULL WHERE id = ?`;
-    };
+// Usuarios/Moderador
+const updateReportArticleStatus = async (connection, {article_id, new_status, new_previous_status}) => {
+    const query = `
+        UPDATE articles 
+        SET status = ?, 
+            previous_status = ? 
+        WHERE id = ?`;
 
-    const [result] = await db.query(query, [id]);
-    
+    const [result] = await connection.query(query, [new_status, new_previous_status, article_id]);
     return result;
 };
 
-module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById, updateArticleStatus };
+module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById, updateReportArticleStatus };
