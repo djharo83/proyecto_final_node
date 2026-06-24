@@ -367,12 +367,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FavoritesArticleResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
         '500':
-          description: Error interno del servidor.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/500InternalServerErrorResponse'
+          $ref: '#/components/responses/ServerError'
                 
   /api/favorites:
     post:
@@ -388,20 +386,35 @@ paths:
             schema:
               type: object
               required:
-                - user_id
                 - article_id
               properties:
-                user_id:
-                  type: integer
-                  description: ID del usuario que añade el favorito
-                  example: 1
                 article_id:
                   type: integer
                   description: ID del artículo que se añade como favorito
                   example: 3
       responses:
         '201':
-          description: Favorito Creado.
+          description: Información del favorito creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteCreatedResponse'
+        '400':
+          description: El artículo ya se encuentra en la lista de favoritos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestFavoriteCreatedResponse'
+        '404':
+          description: El artículo que se quiere añadir a favoritos no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundFavoriteCreatedResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /api/favorites/{id}:
     get:
@@ -548,10 +561,65 @@ paths:
         '200':
           description: Actualizado.
 
+  /api/users/{userId}:
+    get:
+      summary: Obtiene un usuario por su ID
+      description: Devuelve los datos públicos de un usuario concreto.
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: Usuario encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 4
+                  username:
+                    type: string
+                    example: "carlos_vende"
+                  email:
+                    type: string
+                    example: "carlos@email.com"
+                  role:
+                    type: string
+                    example: "Usuario"
+                  status:
+                    type: string
+                    example: "Activo"
+                  avatar_url:
+                    type: string
+                    nullable: true
+                    example: null
+                  location:
+                    type: string
+                    example: "Madrid"
+                  created_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: El usuario no existe con ese ID.
+
   /api/reports:
     post:
       summary: Crear un nuevo reporte (de artículo o de usuario)
-      description: El reporter_id se obtiene automáticamente del token. Si el tipo es 'Articulo' se debe enviar article_id; si es 'Usuario' se debe enviar reported_user_id.
+      description: |
+        El reporter_id se obtiene automáticamente del token.
+        - Si el tipo es **'Articulo'**: se debe enviar article_id. El artículo reportado cambia automáticamente su status a **'En revisión'** y su status anterior queda guardado en el campo **previous_status** para poder recuperarlo después.
+        - Si el tipo es **'Usuario'**: se debe enviar reported_user_id.
+        No se puede enviar article_id and reported_user_id a la vez.
       tags:
         - Reportes
       security:
@@ -585,7 +653,7 @@ paths:
                   example: "El precio parece muy bajo, podría ser fraudulento"
       responses:
         '201':
-          description: Reporte creado con éxito.
+          description: Reporte creado con éxito. Si el tipo es 'Articulo', el artículo pasa automáticamente a 'En revisión'.
         '400':
           description: Faltan campos obligatorios o se han enviado campos incompatibles con el tipo de reporte.
 
@@ -970,6 +1038,110 @@ paths:
         '403':
           description: Acceso denegado, requiere rol Administrador.
 
+  /api/conversations:
+    get:
+      summary: Obtener la bandeja de entrada (inbox) del usuario autenticado
+      description: Devuelve la lista de chats activos donde el usuario autenticado participa como comprador o vendedor.
+      tags:
+        - Conversaciones (Bandeja de Entrada)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de conversaciones recuperada con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationInbox'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      summary: Iniciar o recuperar una conversación para un artículo
+      description: Comprueba si ya existe un chat activo entre el comprador autenticado y el dueño del artículo. Si no existe, crea una fila nueva en la base de datos.
+      tags:
+        - Conversaciones (Bandeja de Entrada)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - article_id
+              properties:
+                article_id:
+                  type: integer
+                  description: ID del artículo sobre el cual se quiere chatear.
+                  example: 9999
+      responses:
+        '200':
+          description: Conversación creada o recuperada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          description: Error en la solicitud (por ejemplo, intentar iniciar un chat contigo mismo).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No puedes iniciar un chat contigo mismo"
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: El artículo especificado no existe.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Artículo no encontrado"
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/messages/{conversationId}:
+    get:
+      summary: Obtener el historial de mensajes de una conversación
+      description: Devuelve el array de mensajes asociados a una conversación ordenados de forma ascendente por su fecha de envío.
+      tags:
+        - Mensajes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: ID de la conversación de la que se desea obtener el historial.
+          schema:
+            type: integer
+          example: 15
+      responses:
+        '200':
+          description: Historial de mensajes recuperado con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -978,7 +1150,30 @@ components:
       bearerFormat: JWT
       description: Introduce tu token JWT sin la palabra 'Bearer'. Solo el texto del token.
 
-  ## Schemas de respuesta
+  responses:
+    UnauthorizedError:
+      description: Token no proporcionado o incorrecto.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: El token es obligatorio en la cabecera Authorization
+    ServerError:
+      description: Error interno del servidor.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Error de conexión con la base de datos
+              message:
+                type: string
+                example: Error interno del servidor
 
   schemas:
 
@@ -1279,6 +1474,72 @@ components:
     500InternalServerErrorResponse:
       type: object
       properties:
-        error:
+        id:
+          type: integer
+          example: 15
+        article_id:
+          type: integer
+          example: 9999
+        buyer_id:
+          type: integer
+          example: 16
+        seller_id:
+          type: integer
+          example: 23
+
+    ConversationInbox:
+      type: object
+      properties:
+        conversation_id:
+          type: integer
+          example: 15
+        article_id:
+          type: integer
+          example: 9999
+        buyer_id:
+          type: integer
+          example: 16
+        seller_id:
+          type: integer
+          example: 23
+        created_at:
           type: string
-          example: "Error de conexión con la base de datos"
+          format: date-time
+          example: "2026-06-20T17:15:00.000Z"
+        article_title:
+          type: string
+          example: "Bicicleta Mágica de Prueba"
+        article_price:
+          type: number
+          format: float
+          example: 150.00
+        buyer_name:
+          type: string
+          example: "Ignacio30"
+        seller_name:
+          type: string
+          example: "Admin"
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 54
+        conversation_id:
+          type: integer
+          example: 15
+        sender_id:
+          type: integer
+          example: 16
+        content:
+          type: string
+          example: "Hola, me interesa la bicicleta"
+        is_read:
+          type: integer
+          enum: [0, 1]
+          example: 1
+        sent_at:
+          type: string
+          format: date-time
+          example: "2026-06-20T17:18:25.000Z"

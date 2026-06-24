@@ -4,6 +4,11 @@ GET http://localhost:3000/api/test
 
 GET http://localhost:3000/api/users
 
+
+###
+
+GET http://localhost:3000/api/users/8
+
 ###REEGISTRO###
 ###
 POST http://localhost:3000/api/users/register
@@ -21,7 +26,7 @@ POST http://localhost:3000/api/users/login
 Content-Type: application/json
 
 {
-    "email": "Moderador@gmail.com",
+    "email": "andreamania10@gmail.com",
     "password":"chorizo"
 }
 
