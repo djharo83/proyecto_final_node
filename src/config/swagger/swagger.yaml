@@ -119,11 +119,7 @@ paths:
                           format: date-time
                           example: "2026-06-09T20:00:00Z"
         '500':
-          description: Error interno del servidor.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/500InternalServerErrorResponse'
+          $ref: '#/components/responses/ServerError'
 
     post:
       summary: Crea un nuevo artículo con imágenes
@@ -1176,9 +1172,6 @@ components:
                 example: Error interno del servidor
 
   schemas:
-
-    ## Favoritos
-
     FavoritesArticleResponse:
       type: object
       properties:
@@ -1224,7 +1217,65 @@ components:
                 items:
                   $ref: '#/components/schemas/PhotosResponse'
 
-    ## Categorias
+    FavoriteCreatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Favorito creado exitosamente
+        favorite:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 38
+            user_id:
+              type: integer
+              example: 51
+            article_id:
+              type: integer
+              example: 7
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-23T08:27:05.000Z'
+          required:
+            - id
+            - user_id
+            - article_id
+            - created_at
+      required:
+        - message
+        - favorite
+      example:
+        message: Favorito creado exitosamente
+        favorite:
+          id: 38
+          user_id: 51
+          article_id: 7
+          created_at: '2026-06-23T08:27:05.000Z'
+
+    BadRequestFavoriteCreatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Este artículo ya está en tu lista de favoritos.
+      required:
+        - message
+      example:
+        message: Este artículo ya está en tu lista de favoritos.
+
+    NotFoundFavoriteCreatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: El artículo que intentas guardar en favoritos no existe.
+      required:
+        - message
+      example:
+        message: El artículo que intentas guardar en favoritos no existe.
 
     CategoryResponse:
       type: object
@@ -1239,8 +1290,6 @@ components:
           type: string
           example: electronica
 
-    ## Fotos
-
     PhotosResponse:
       type: object
       properties:
@@ -1254,6 +1303,79 @@ components:
         order:
           type: integer
           example: 0
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 15
+        article_id:
+          type: integer
+          example: 9999
+        buyer_id:
+          type: integer
+          example: 16
+        seller_id:
+          type: integer
+          example: 23
+
+    ConversationInbox:
+      type: object
+      properties:
+        conversation_id:
+          type: integer
+          example: 15
+        article_id:
+          type: integer
+          example: 9999
+        buyer_id:
+          type: integer
+          example: 16
+        seller_id:
+          type: integer
+          example: 23
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-06-20T17:15:00.000Z"
+        article_title:
+          type: string
+          example: "Bicicleta Mágica de Prueba"
+        article_price:
+          type: number
+          format: float
+          example: 150.00
+        buyer_name:
+          type: string
+          example: "Ignacio30"
+        seller_name:
+          type: string
+          example: "Admin"
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 54
+        conversation_id:
+          type: integer
+          example: 15
+        sender_id:
+          type: integer
+          example: 16
+        content:
+          type: string
+          example: "Hola, me interesa la bicicleta"
+        is_read:
+          type: integer
+          enum: [0, 1]
+          example: 1
+        sent_at:
+          type: string
+          format: date-time
+          example: "2026-06-20T17:18:25.000Z"
 
     ## Reportes
     ReportsArticlesResponse:
@@ -1468,78 +1590,3 @@ components:
               reporter_username:
                 type: string
                 example: diego_vende
-
-    ## Respuestas de error
-
-    500InternalServerErrorResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 15
-        article_id:
-          type: integer
-          example: 9999
-        buyer_id:
-          type: integer
-          example: 16
-        seller_id:
-          type: integer
-          example: 23
-
-    ConversationInbox:
-      type: object
-      properties:
-        conversation_id:
-          type: integer
-          example: 15
-        article_id:
-          type: integer
-          example: 9999
-        buyer_id:
-          type: integer
-          example: 16
-        seller_id:
-          type: integer
-          example: 23
-        created_at:
-          type: string
-          format: date-time
-          example: "2026-06-20T17:15:00.000Z"
-        article_title:
-          type: string
-          example: "Bicicleta Mágica de Prueba"
-        article_price:
-          type: number
-          format: float
-          example: 150.00
-        buyer_name:
-          type: string
-          example: "Ignacio30"
-        seller_name:
-          type: string
-          example: "Admin"
-
-    Message:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 54
-        conversation_id:
-          type: integer
-          example: 15
-        sender_id:
-          type: integer
-          example: 16
-        content:
-          type: string
-          example: "Hola, me interesa la bicicleta"
-        is_read:
-          type: integer
-          enum: [0, 1]
-          example: 1
-        sent_at:
-          type: string
-          format: date-time
-          example: "2026-06-20T17:18:25.000Z"
