@@ -2,9 +2,9 @@
 const db = require('../config/db');
 
 // Usuario
-const insert = async (body) => {
+const insert = async (conection, body) => {
     const { reporter_id, article_id, reported_user_id, type, reason } = body;
-    const [result] = await db.query(
+    const [result] = await conection.query(
         `INSERT INTO reports (reporter_id, article_id, reported_user_id, type, reason, status)
          VALUES (?, ?, ?, ?, ?, 'Pendiente')`,
         [reporter_id, article_id || null, reported_user_id || null, type, reason]
@@ -103,7 +103,8 @@ const selectReportPendingUser = async (report_id) => {
 	u_reported.email AS reported_email,
 	u_reported.avatar_url AS reported_avatar,
 	u_reported.avg_rating AS reported_avg_rating,
-	u_reported.location AS reported_location
+	u_reported.location AS reported_location,
+    u_reported.status AS reported_status
         FROM proyecto_final_segunda_mano_db.reports r
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
         INNER JOIN users u_reported ON r.reported_user_id = u_reported.id
@@ -156,5 +157,4 @@ module.exports = { insert,
                    selectReportsPendingUsers, 
                    selectReportPendingUser, 
                    selectReportsHistory,
-                   updateReport, 
-                   selectReportById };
+                   updateReport};

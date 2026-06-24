@@ -3,49 +3,99 @@ const ReportsModel = require('../models/reports.model');
 const ArticlesModel = require("../models/articles.model");
 const NotificationsModel =  require("../models/notifications.model"); 
 const { StatusCodes } = require("http-status-codes");
+const db = require('../config/db');
 
 // Usuarios 
-const createReport = async (req, res) => {
+const createReport = async (req, res, next) => {
+    
     const { type, article_id, reported_user_id, reason } = req.body;
+    const reporter_id = req.user.id;
+
 
     if (!type || !reason) {
         return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El tipo y el motivo son obligatorios' });
     }
 
     let body = {
-        reporter_id: req.user.id,
+        reporter_id,
         type,
         reason,
         article_id: null,
         reported_user_id: null
     };
 
-    if (type === 'Articulo') {
-        if (!article_id) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Falta el article_id para reportar un artículo' });
-        }
-        if (reported_user_id) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No se debe enviar reported_user_id cuando el tipo es Articulo' });
-        }
-        body.article_id = article_id;
+    // Obtenemos una conexion para mantener la integridad de los datos en caso de que se produzca algún error.
+    const connection = await db.getConnection();
 
-    } else if (type === 'Usuario') {
-        if (!reported_user_id) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Falta el reported_user_id para reportar un usuario' });
-        }
-        if (article_id) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No se debe enviar article_id cuando el tipo es Usuario' });
-        }
-        body.reported_user_id = reported_user_id;
+    try{
+    
+        await connection.beginTransaction();
 
-    } else {
-        return res.status(StatusCodes.BAD_REQUEST).json({ message: "El tipo debe ser 'Articulo' o 'Usuario'" });
+        if (type === 'Articulo') {
+
+            if (!article_id) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Falta el article_id para reportar un artículo' });
+            }
+            if (reported_user_id) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No se debe enviar reported_user_id cuando el tipo es Articulo' });
+            }
+            
+            body.article_id = article_id;
+
+            //Mover el artículo a 'En revisión' automáticamente al recibir el reporte
+            // Guardamos el estado actual en 'previous_status' antes de sobreescribir 'status'
+            const articleStatus = await ArticlesModel.getArticleStatus(article_id);
+
+            if (!articleStatus) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo no existe'});
+            }
+
+            await ArticlesModel.updateReportArticleStatus(
+                connection, 
+                {   article_id : article_id,
+                    new_status : 'En revisión',
+                    new_previous_status : articleStatus
+                }
+            );
+
+        } else if (type === 'Usuario') {
+            
+            if (!reported_user_id) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Falta el reported_user_id para reportar un usuario' });
+            }
+            if (article_id) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No se debe enviar article_id cuando el tipo es Usuario' });
+            }
+            if (reported_user_id === reporter_id) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No puedes reportarte a ti mismo' });
+            }
+            
+            body.reported_user_id = reported_user_id;
+
+        } else {
+            await connection.rollback();
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: "El tipo debe ser 'Articulo' o 'Usuario'" });
+        }
+
+        await ReportsModel.insert(connection, body);
+
+        await connection.commit();
+
+        //El usuario no necesita información del reporte.
+        return res.status(StatusCodes.OK).json({ message: "Reporte creado correctamente."});
+
+    } catch (error) {
+        await connection.rollback();
+        next(error);
+    } finally {
+        connection.release();
     }
-
-    const result = await ReportsModel.insert(body);
-
-    //El usuario no necesita información del reporte.
-    return res.status(StatusCodes.OK).json({ message: "Reporte creado correctamente."});
 }
 
 // Moderador
@@ -120,7 +170,7 @@ const getReportPendingUser = async (req, res, next) => {
     }
 }
 
-const updateReportArticle = async (req, res, next) => {
+const updateReportAndArticle = async (req, res, next) => {
     
     const { action, moderator_note } = req.body;
     
@@ -151,7 +201,7 @@ const updateReportArticle = async (req, res, next) => {
         // Actualizar el estado del artículo.
         if (action === 'accept') {
             // El moderador lo retira definitivamente: previous_status pasa a ser NULL
-            await ArticlesModel.updateArticleStatusGeneric(
+            await ArticlesModel.updateReportArticleStatus(
                 connection, 
                 {   article_id : article_id,
                     new_status : 'Retirado',
@@ -160,7 +210,7 @@ const updateReportArticle = async (req, res, next) => {
             );
         } else if (action === 'reject') {
             // El moderador desestima el reporte: vuelve a su estado original y limpiamos el histórico
-            await ArticlesModel.updateArticleStatusGeneric(
+            await ArticlesModel.updateReportArticleStatus(
                 connection, 
                 {   article_id : article_id,
                     new_status : previous_status,
@@ -197,11 +247,11 @@ const updateReportArticle = async (req, res, next) => {
     }
 }
 
-const getReportsHistory = async (req, res) => {
+const getReportsHistory = async (req, res, next) => {
     
     try {
         
-        const reportsHistory = await ReportModel.selectReportsHistory();
+        const reportsHistory = await ReportsModel.selectReportsHistory();
         
         return res.status(StatusCodes.OK).json({ results: reportsHistory });
     
@@ -234,6 +284,6 @@ module.exports = { createReport,
                    getReportsPendingUsers, 
                    getReportPendingArticle, 
                    getReportPendingUser, 
-                   updateReportArticle,
+                   updateReportAndArticle,
                    getReportsHistory
                 };

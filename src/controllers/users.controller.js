@@ -74,5 +74,5 @@ const create = async (req, res) => {
 
 
 module.exports = {
-    getAll, edit,create
+    getAll, edit
 }
