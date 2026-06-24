@@ -18,8 +18,8 @@ router.post('/', checkToken, createReport);
 //Rutas Moderador
 router.get('/pending/articles', checkToken, checkRole(['Moderador', 'Administrador']), getReportsPendingArticles);
 router.get('/pending/users', checkToken, checkRole(['Moderador', 'Administrador']), getReportsPendingUsers);
-router.get('/pending/article/detail/:id', checkToken, checkRole(['Moderador', 'Administrador']), getReportPendingArticle);
-router.get('/pending/user/detail/:id', checkToken, checkRole(['Moderador', 'Administrador']), getReportPendingUser);
+router.get('/pending/articles/:id', checkToken, checkRole(['Moderador', 'Administrador']), getReportPendingArticle);
+router.get('/pending/users/:id', checkToken, checkRole(['Moderador', 'Administrador']), getReportPendingUser);
 router.put('/resolution/:id', checkToken, checkRole(['Moderador', 'Administrador']), updateReportAndArticle);
 router.get('/history', checkToken, checkRole(['Moderador', 'Administrador']), getReportsHistory);
 

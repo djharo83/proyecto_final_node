@@ -125,7 +125,7 @@ const getReportPendingArticle = async (req, res, next) => {
         const reportArticle = await ReportsModel.selectReportPendingArticle(report_id);
 
         if (!reportArticle) {
-            return res.status(StatusCodes.NOT_FOUND).json({ message: "Reporte Artículo no encontrada" });
+            return res.status(StatusCodes.NOT_FOUND).json({ message: "El reporte no existe, ya fue procesado o no corresponde a un artículo." });
         }
 
         return res.status(StatusCodes.OK).json({ reportArticle });
@@ -160,7 +160,7 @@ const getReportPendingUser = async (req, res, next) => {
         const reportUser = await ReportsModel.selectReportPendingUser(report_id);
 
         if (!reportUser) {
-            return res.status(StatusCodes.NOT_FOUND).json({ message: "Reporte Usuario no encontrada" });
+            return res.status(StatusCodes.NOT_FOUND).json({ message: "El reporte no existe, ya fue procesado o no corresponde a un usuario." });
         }
 
         return res.status(StatusCodes.OK).json({ reportUser });

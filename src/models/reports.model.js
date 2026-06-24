@@ -55,6 +55,8 @@ const selectReportPendingArticle = async (report_id) => {
     LEFT JOIN article_photos ap ON ap.article_id = a.id
     INNER JOIN users u_seller ON a.user_id = u_seller.id 
     WHERE r.id = ?
+    AND r.status = 'Pendiente' 
+    AND r.type = 'Articulo'
     GROUP BY r.id, a.id`;
 
     const [result] = await db.query(query, [report_id]);
@@ -97,18 +99,20 @@ const selectReportPendingUser = async (report_id) => {
     let query = `SELECT 
     r.id AS report_id, r.reason, r.created_at,
 	u_reporter.id AS reporter_user_id,
-    u_reporter.username AS reporter_username,
+    u_reporter.username AS reporter_user_username,
     u_reported.id AS reported_user_id,
-    u_reported.username AS reported_username,
-	u_reported.email AS reported_email,
-	u_reported.avatar_url AS reported_avatar,
-	u_reported.avg_rating AS reported_avg_rating,
-	u_reported.location AS reported_location,
-    u_reported.status AS reported_status
+    u_reported.username AS reported_user_username,
+	u_reported.email AS reported_user_email,
+	u_reported.avatar_url AS reported_user_avatar,
+	u_reported.avg_rating AS reported_user_avg_rating,
+	u_reported.location AS reported_user_location,
+    u_reported.status AS reported_user_status
         FROM proyecto_final_segunda_mano_db.reports r
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
         INNER JOIN users u_reported ON r.reported_user_id = u_reported.id
-        WHERE r.id = ?`;
+        WHERE r.id = ?
+        AND r.status = 'Pendiente'
+        AND r.type = 'Usuario'`;
 
     const [result] = await db.query(query, [report_id]);
     

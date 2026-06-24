@@ -14,9 +14,9 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        200:
+        '200':
           description: Listado de los artículos del usuario obtenido con éxito.
-        403:
+        '403':
           description: Token no proporcionado o incorrecto.
 
   /api/articles:
@@ -194,7 +194,7 @@ paths:
                 category_id: { type: integer, example: 3 }
                 location: { type: string, example: "Madrid" }
       responses:
-        200:
+        '200':
           description: Artículo actualizado exitosamente.
 
     delete:
@@ -210,7 +210,7 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        200:
+        '200':
           description: Artículo eliminado exitosamente.
 
   /api/articles/{id}/status:
@@ -239,7 +239,7 @@ paths:
                   enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido']
                   example: "Vendido"
       responses:
-        200:
+        '200':
           description: Estado actualizado con éxito.
 
   /api/categories/landing:
@@ -549,18 +549,6 @@ paths:
           description: Actualizado.
 
   /api/reports:
-    get:
-      summary: Obtiene todos los reportes
-      description: Solo accesible para Moderador o Administrador.
-      tags:
-        - Reportes
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Listado de reportes obtenido con éxito.
-        '403':
-          description: Acceso denegado, requiere rol Moderador o Administrador.
     post:
       summary: Crear un nuevo reporte (de artículo o de usuario)
       description: El reporter_id se obtiene automáticamente del token. Si el tipo es 'Articulo' se debe enviar article_id; si es 'Usuario' se debe enviar reported_user_id.
@@ -600,6 +588,135 @@ paths:
           description: Reporte creado con éxito.
         '400':
           description: Faltan campos obligatorios o se han enviado campos incompatibles con el tipo de reporte.
+
+  /api/reports/pending/articles:
+    get:
+      summary: Reportes pendientes para los artículos
+      description: Obtiene los reportes pendientes para los artículos (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reportes pendientes para los articulos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsArticlesResponse'
+
+  /api/reports/pending/articles/{id}:
+    get:
+      summary: Detalle del reporte pendiente para un artículo
+      description: Obtiene el detalle de un reporte pendiente para un artículo (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del reporte.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalle del reporte pendiente para un artículo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportArticleResponse'
+  
+  /api/reports/pending/users:
+    get:
+      summary: Reportes pendientes para los usuarios
+      description: Obtiene los reportes pendientes para los usuarios (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reportes pendientes para los usuarios.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsUsersResponse'
+
+  /api/reports/pending/users/{id}:
+    get:
+      summary: Detalle del reporte pendiente para un usuario.
+      description: Obtiene el detalle del reporte pendiente para un usuario (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del reporte.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalle del reporte pendiente para un usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportUserResponse'
+
+  /api/reports/history:
+    get:
+      summary: Lista de reportes resueltos para articulos y usuarios.
+      description: Obtiene una lista de reportes resueltos tanto para artículos como para reportes (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reportes resueltos para articulos y usuarios.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsHistoryResponse'
+
+  /api/reports/resolution/{id}:
+    put:
+      summary: Resolución del reporte(de artículo o de usuario) (Accesible Solo para el Moderador o Adminsitrador)
+      description: Resuelve el reporte de un usuario o un articulo (accept-Acepta el reporte y Retira el artículo o reject-Rechaza el reporte y devuelve el artículo a su estado original)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del reporte.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - moderator_note
+              properties:
+                action:
+                  type: string
+                  example: "accept ó reject"
+                moderator_note:
+                  type: string
+                  example: "El artículo infringe las normas o El artículo cumple las normas"
+      responses:
+        '200':
+          description: Reporte resuelto correctamente.
 
   /api/admin/stats:
     get:
@@ -864,6 +981,9 @@ components:
   ## Schemas de respuesta
 
   schemas:
+
+    ## Favoritos
+
     FavoritesArticleResponse:
       type: object
       properties:
@@ -909,6 +1029,8 @@ components:
                 items:
                   $ref: '#/components/schemas/PhotosResponse'
 
+    ## Categorias
+
     CategoryResponse:
       type: object
       properties:
@@ -921,6 +1043,8 @@ components:
         slug:
           type: string
           example: electronica
+
+    ## Fotos
 
     PhotosResponse:
       type: object
@@ -935,6 +1059,220 @@ components:
         order:
           type: integer
           example: 0
+
+    ## Reportes
+    ReportsArticlesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              report_id:
+                type: integer
+                example: 26
+              report_reason:
+                type: string
+                example: me quedan pequeñas
+              report_created_at:
+                type: string
+                format: date-time
+                example: '2026-06-21T15:42:52.000Z'
+              reporter_username:
+                type: string
+                example: Admin
+              article_id:
+                type: integer
+                example: 18
+              article_title:
+                type: string
+                example: Abrigo de Invierno Plumas
+              article_price:
+                type: string
+                example: '120.00'
+            required:
+              - report_id
+              - report_reason
+              - report_created_at
+              - reporter_username
+              - article_id
+              - article_title
+              - article_price
+
+    ReportArticleResponse:
+      type: object
+      properties:
+        reportArticle:
+          type: object
+          properties:
+            report_id:
+              type: integer
+              example: 26
+            reason:
+              type: string
+              example: me quedan pequeñas
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-21T15:42:52.000Z'
+            article_id:
+              type: integer
+              example: 18
+            title:
+              type: string
+              example: Abrigo de Invierno Plumas
+            description:
+              type: string
+              example: Muy abrigado, talla XL. Color verde militar.
+            price:
+              type: string
+              example: '120.00'
+            condition:
+              type: string
+              example: Nuevo
+            location:
+              type: string
+              example: Madrid
+            previous_status:
+              type: string
+              example: Publicado
+            status:
+              type: string
+              example: En revisión
+            seller_id:
+              type: integer
+              example: 2
+            seller_username:
+              type: string
+              example: jose_dev
+            photos:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 54
+                  url:
+                    type: string
+                    format: uri
+                    example: https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=600&q=80
+                  order:
+                    type: integer
+                    example: 0
+
+    ReportsUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              report_id:
+                type: integer
+                example: 31
+              report_reason:
+                type: string
+                example: me intenta estafar por el chat otra vez
+              report_created_at:
+                type: string
+                format: date-time
+                example: '2026-06-24T15:01:05.000Z'
+              reporter_username:
+                type: string
+                example: diego_vende
+              reported_user_id:
+                type: integer
+                example: 5
+              reported_username:
+                type: string
+                example: maria_compra
+            required:
+              - report_id
+              - report_reason
+              - report_created_at
+              - reporter_username
+              - reported_user_id
+              - reported_username
+
+    ReportUserResponse:
+      type: object
+      properties:
+        reportUser:
+          type: object
+          properties:
+            report_id:
+              type: integer
+              example: 5
+            reason:
+              type: string
+              example: me intenta estafar por el chat
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-14T12:53:05.000Z'
+            reporter_user_id:
+              type: integer
+              example: 16
+            reporter_user_username:
+              type: string
+              example: Ignacio30
+            reported_user_id:
+              type: integer
+              example: 5
+            reported_user_username:
+              type: string
+              example: maria_compra
+            reported_user_email:
+              type: string
+              format: email
+              example: maria@email.com
+            reported_user_avatar:
+              type: string
+              format: uri
+              example: https://i.pravatar.cc/150?u=5
+            reported_user_avg_rating:
+              type: string
+              example: '4.80'
+            reported_user_location:
+              type: string
+              example: Sevilla
+            reported_user_status:
+              type: string
+              example: Activo
+
+    ReportsHistoryResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              report_id:
+                type: integer
+                example: 30
+              report_type:
+                type: string
+                example: Articulo
+              report_reason:
+                type: string
+                example: El precio parece muy bajo, podría ser fraudulento
+              resolution_note:
+                type: string
+                example: El artículo infringe las normas o las condiciones de la plataforma
+              resolution_date:
+                type: string
+                format: date-time
+                example: '2026-06-24T14:46:16.000Z'
+              moderator_username:
+                type: string
+                example: Moderador
+              reporter_username:
+                type: string
+                example: diego_vende
 
     ## Respuestas de error
 
