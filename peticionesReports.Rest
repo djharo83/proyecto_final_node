@@ -2,19 +2,19 @@
 
 # reportar articulo
 POST http://localhost:3000/api/reports
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxNDQ4NDgxLCJleHAiOjE3ODE1MzQ4ODF9.VdVhnQygTJbkqIoTloJ-CHig7Diq3sDc0Y2l9x2epAM
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjQyMTIwMywiZXhwIjoxNzgyNDI0ODAzfQ.oYQCZn2Un5yhdaWnC_0D_0z8H1jBIXwixXVsWIniWu0
 Content-Type: application/json
 
 {
     "type": "Articulo",
-    "article_id": 11,
-    "reason": "Teclado roto"
+    "article_id": 2,
+    "reason": "Las zapatillas llegaron rotas"
 }
 
 # reportar usuario
 ###
 POST http://localhost:3000/api/reports
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MjA2MjM2OCwiZXhwIjoxNzgyMDY1OTY4fQ.42oEAydN4_2R_JnXD8UV0Y7epcvOxxPns15I8xzvsaw
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjQyMTIwMywiZXhwIjoxNzgyNDI0ODAzfQ.oYQCZn2Un5yhdaWnC_0D_0z8H1jBIXwixXVsWIniWu0
 Content-Type: application/json 
 
 {
