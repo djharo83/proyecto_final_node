@@ -140,16 +140,16 @@ const selectReportsHistory = async () => {
     return result;
 }
 
-const updateReport = async (connection, {moderator_id, moderator_note, report_id}) => {
+const updateReport = async (connection, {moderator_id, moderator_note, article_id}) => {
 
     let query = `UPDATE reports 
             SET status = 'Resuelto',
                 moderator_id = ?,
                 moderator_note = ?,
                 resolved_at = NOW()
-            WHERE id = ?`;
+            WHERE article_id = ?`;
 
-    const [result] = await connection.query(query, [moderator_id, moderator_note, report_id]);
+    const [result] = await connection.query(query, [moderator_id, moderator_note, article_id]);
   
     return result;
 

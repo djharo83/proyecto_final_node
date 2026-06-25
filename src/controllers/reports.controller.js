@@ -46,20 +46,27 @@ const createReport = async (req, res, next) => {
 
             //Mover el artículo a 'En revisión' automáticamente al recibir el reporte
             // Guardamos el estado actual en 'previous_status' antes de sobreescribir 'status'
-            const articleStatus = await ArticlesModel.getArticleStatus(article_id);
+            const articleStatus = await ArticlesModel.getArticleStatus(connection, article_id);
 
             if (!articleStatus) {
                 await connection.rollback();
                 return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo no existe'});
             }
 
-            await ArticlesModel.updateReportArticleStatus(
-                connection, 
-                {   article_id : article_id,
-                    new_status : 'En revisión',
-                    new_previous_status : articleStatus
-                }
-            );
+            console.log('*****', articleStatus, '*********');
+
+            // Si el artículo ya está 'En revisión', no hacemos lógica de actualización de estados, 
+            // pero SÍ permitimos que se inserte el reporte para que el moderador tenga constancia.
+            if (articleStatus !== 'En revisión') {
+                await ArticlesModel.updateReportArticleStatus(
+                    connection, 
+                    {   
+                        article_id : article_id,
+                        new_status : 'En revisión',
+                        new_previous_status : articleStatus // Guardamos el estado actual del artículo
+                    }
+                );
+            }
 
         } else if (type === 'Usuario') {
             
@@ -220,7 +227,7 @@ const updateReportAndArticle = async (req, res, next) => {
         }
         
         // Actualizar el reporte a 'Resuelto'
-        await ReportsModel.updateReport(connection, {moderator_id, moderator_note, report_id});
+        await ReportsModel.updateReport(connection, {moderator_id, moderator_note, article_id});
 
         // Crear la notificacion para informar al usuario de la resolucion del reporte
         const { notificationType, notificationContent } = buildReportNotificationData(action, article_title, moderator_note)

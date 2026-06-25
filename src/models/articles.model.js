@@ -176,8 +176,8 @@ const updateReportArticleStatus = async (connection, {article_id, new_status, ne
     return result;
 };
 
-const getArticleStatus = async(article_id) => {
-    const [result] = await db.query("SELECT ar.status FROM articles ar WHERE ar.id = ?", [article_id]);
+const getArticleStatus = async(connection, article_id) => {
+    const [result] = await connection.query("SELECT ar.status FROM articles ar WHERE ar.id = ?", [article_id]);
     return result[0] ? result[0].status : null;
 }
 
