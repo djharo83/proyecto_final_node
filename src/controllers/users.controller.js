@@ -1,8 +1,4 @@
 const UserModel = require('../models/users.model');
-const ReportModel = require('../models/reports.model');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
 
 // devuelve todos los usuarios
 const getAll = async (req, res) => {

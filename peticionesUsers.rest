@@ -46,49 +46,6 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyLCJyb2xlIjoi
     "avatar_url": null
 }
 
-### reportar un usuario
-POST http://localhost:3000/api/users/reports
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTU0OTAzMSwiZXhwIjoxNzgxNTUyNjMxfQ.9a5vgYtxVbkQczVRJO35ANMIPv0uDi-qyVYeLVoNMZE
-Content-Type: application/json
-
-{
-    "type": "Usuario",
-    "reported_user_id": 5,
-    "reason": "me intenta estafar por el chat"
-}
-
-### reportar un article
-POST http://localhost:3000/api/users/reports
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTU0OTAzMSwiZXhwIjoxNzgxNTUyNjMxfQ.9a5vgYtxVbkQczVRJO35ANMIPv0uDi-qyVYeLVoNMZE
-Content-Type: application/json
-
-{
-    "type": "Articulo",
-    "article_id": 7,
-    "reason": "llega roto"
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### pRUEBA DE SI RENDER FUNCIONA
 GET https://proyecto-final-node-5pwe.onrender.com/api/test
 

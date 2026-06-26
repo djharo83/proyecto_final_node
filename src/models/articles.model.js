@@ -144,8 +144,6 @@ const updateStatus = async (id, newStatus) => {
 };
 
 
-
-
 // 6. Eliminar artículo y sus fotos asociadas
 const deleteById = async (id) => {
     // A. Borramos las fotos asociadas de la tabla secundaria
@@ -157,6 +155,7 @@ const deleteById = async (id) => {
     return result.affectedRows > 0;
 };
 
+// Consulta para favoritos
 const existsArticleById = async(id) => {
 
     const [rows] = await db.query("SELECT EXISTS(SELECT 1 FROM articles WHERE id = ?) AS existe", [id]);
@@ -165,4 +164,21 @@ const existsArticleById = async(id) => {
 
 }
 
-module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById };
+// Usuarios/Moderador
+const updateReportArticleStatus = async (connection, {article_id, new_status, new_previous_status}) => {
+    const query = `
+        UPDATE articles 
+        SET status = ?, 
+            previous_status = ? 
+        WHERE id = ?`;
+
+    const [result] = await connection.query(query, [new_status, new_previous_status, article_id]);
+    return result;
+};
+
+const getArticleStatus = async(article_id) => {
+    const [result] = await db.query("SELECT ar.status FROM articles ar WHERE ar.id = ?", [article_id]);
+    return result[0] ? result[0].status : null;
+}
+
+module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById, updateReportArticleStatus, getArticleStatus };
