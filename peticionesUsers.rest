@@ -15,8 +15,8 @@ POST http://localhost:3000/api/users/register
 Content-Type: application/json
 
 {
-    "username": "Admin",
-    "email": "Admin@gmail.com",
+    "username": "pruebadelschema",
+    "email": "Schema@gmail.com",
     "password":"chorizo"
 }
 
@@ -26,7 +26,7 @@ POST http://localhost:3000/api/users/login
 Content-Type: application/json
 
 {
-    "email": "Moderador@gmail.com",
+    "email": "Schema@gmail.com",
     "password":"chorizo"
 }
 
@@ -37,12 +37,12 @@ Content-Type: application/json
 
 PUT http://localhost:3000/api/users/profile
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgwOTMxODMwLCJleHAiOjE3ODEwMTgyMzB9.7w3AwtJB-6FSMYVIF2As0a_sHZaGkFLoZskp1B-1EgY
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjQyMTIwMywiZXhwIjoxNzgyNDI0ODAzfQ.oYQCZn2Un5yhdaWnC_0D_0z8H1jBIXwixXVsWIniWu0
 
 {
-    "username": "Ignacio30",
-    "email": "Ignacio30@gmail.com",
-    "location": "Valencia",
+    "username": "Schema",
+    "email": "Schema@gmail.com",
+    "location": "España",
     "avatar_url": null
 }
 

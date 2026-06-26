@@ -1,4 +1,8 @@
 const router = require('express').Router();
+const { validateSchema } = require('../../middlewares/validation.middleware');
+const { reportSchema } = require('../../schemas/reports.schema');
+
+// Rutas de /api/reports
 
 const { createReport,
         getReportsPendingArticles,
@@ -8,12 +12,12 @@ const { createReport,
         updateReportAndArticle,
         getReportsHistory } = require('../../controllers/reports.controller');
 
-        const { checkToken, checkRole } = require('../../middlewares/auth.middleware');
+const { checkToken, checkRole } = require('../../middlewares/auth.middleware');
 
 //Rutas de /api/reports
 
 //Ruta para que el usurio cree un reporte
-router.post('/', checkToken, createReport);
+router.post('/', checkToken, validateSchema(reportSchema), createReport);
 
 //Rutas Moderador
 router.get('/pending/articles', checkToken, checkRole(['Moderador', 'Administrador']), getReportsPendingArticles);
