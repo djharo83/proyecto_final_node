@@ -13,47 +13,47 @@ Content-Type: application/json
 # reportar articulo
 ###
 POST http://localhost:3000/api/reports
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjI5NjI0MywiZXhwIjoxNzgyMjk5ODQzfQ.Ue2ebvTN0lJQ2QqOslLt68FZHa-ZMbEiRQ7qttsC-9w
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjQ3NjgzNiwiZXhwIjoxNzgyNDgwNDM2fQ.KyvH0fBDJTeKUTu0DXBniL7dvWAVJbs4gOdAq7h2FXE
 Content-Type: application/json
 
 {
   "type": "Articulo",
-  "article_id": 10,
+  "article_id": 47,
   "reason": "El precio parece muy bajo, podría ser fraudulento"
 }
 
 # Obtener reportes pendientes de artículos (Moderador/Administrador)
 ###
 GET http://localhost:3000/api/reports/pending/articles
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyNDc2OTY1LCJleHAiOjE3ODI0ODA1NjV9.FGEp_0gMlPCDy0H1iFwb6aL7ThzNrKTjTH0QG3uZA6g
 
 # Obtener detalle reporte pendiente del artículo (Moderador/Administrador)
 ###
-GET http://localhost:3000/api/reports/pending/article/detail/29
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+GET http://localhost:3000/api/reports/pending/articles/41
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyNDc2OTY1LCJleHAiOjE3ODI0ODA1NjV9.FGEp_0gMlPCDy0H1iFwb6aL7ThzNrKTjTH0QG3uZA6g
 
 # Obtener reportes pendientes de usuarios (Moderador/Administrador)
 ###
 GET http://localhost:3000/api/reports/pending/users
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyNDc2OTY1LCJleHAiOjE3ODI0ODA1NjV9.FGEp_0gMlPCDy0H1iFwb6aL7ThzNrKTjTH0QG3uZA6g
 
 # Obtener detalle reporte pendiente del artículo (Moderador/Administrador)
 ###
-GET http://localhost:3000/api/reports/pending/user/detail/5
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+GET http://localhost:3000/api/reports/pending/users/33
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyNDc2OTY1LCJleHAiOjE3ODI0ODA1NjV9.FGEp_0gMlPCDy0H1iFwb6aL7ThzNrKTjTH0QG3uZA6g
 
 # Resolucíon del reporte de un artículo (Moderador/Administrador)
 ###
-PUT http://localhost:3000/api/reports/resolution/29
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+PUT http://localhost:3000/api/reports/resolution/41
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyNDc2OTY1LCJleHAiOjE3ODI0ODA1NjV9.FGEp_0gMlPCDy0H1iFwb6aL7ThzNrKTjTH0QG3uZA6g
 Content-Type: application/json
 
 {
-    "action": "reject",
-    "moderator_note": "El artículo cumple las condiciones de la plataforma"
+    "action": "accept",
+    "moderator_note": "El artículo no cumple las condiciones de la plataforma"
 }
 
 # Obtener el historial de reportes resueltos (Moderador/Administrador)
 ###
 GET http://localhost:3000/api/reports/history
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyNDc2OTY1LCJleHAiOjE3ODI0ODA1NjV9.FGEp_0gMlPCDy0H1iFwb6aL7ThzNrKTjTH0QG3uZA6g

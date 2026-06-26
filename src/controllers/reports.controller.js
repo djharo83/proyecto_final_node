@@ -4,6 +4,10 @@ const ArticlesModel = require("../models/articles.model");
 const NotificationsModel =  require("../models/notifications.model"); 
 const { StatusCodes } = require("http-status-codes");
 const db = require('../config/db');
+const { ReportTypeEnum, 
+        ActionResoluntionReportEnum, 
+        ArticleStatusEnum, 
+        NotificationTypeEnum } = require("../constants/enums.js"); 
 
 // Usuarios 
 const createReport = async (req, res, next) => {
@@ -31,7 +35,7 @@ const createReport = async (req, res, next) => {
     
         await connection.beginTransaction();
 
-        if (type === 'Articulo') {
+        if (type === ReportTypeEnum.ARTICLE) {
 
             if (!article_id) {
                 await connection.rollback();
@@ -44,31 +48,28 @@ const createReport = async (req, res, next) => {
             
             body.article_id = article_id;
 
-            //Mover el artículo a 'En revisión' automáticamente al recibir el reporte
-            // Guardamos el estado actual en 'previous_status' antes de sobreescribir 'status'
+            // Obtener la información necesaria para actualizar el artículo
             const articleStatus = await ArticlesModel.getArticleStatus(connection, article_id);
 
             if (!articleStatus) {
                 await connection.rollback();
-                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo no existe'});
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo que quiere reportar no existe o ha sido resuelto'});
             }
-
-            console.log('*****', articleStatus, '*********');
 
             // Si el artículo ya está 'En revisión', no hacemos lógica de actualización de estados, 
             // pero SÍ permitimos que se inserte el reporte para que el moderador tenga constancia.
-            if (articleStatus !== 'En revisión') {
+            if (articleStatus !== ArticleStatusEnum.UNDER_REVIEW) {
                 await ArticlesModel.updateReportArticleStatus(
                     connection, 
                     {   
                         article_id : article_id,
-                        new_status : 'En revisión',
+                        new_status : ArticleStatusEnum.UNDER_REVIEW,
                         new_previous_status : articleStatus // Guardamos el estado actual del artículo
                     }
                 );
             }
 
-        } else if (type === 'Usuario') {
+        } else if (type === ReportTypeEnum.USER) {
             
             if (!reported_user_id) {
                 await connection.rollback();
@@ -185,7 +186,7 @@ const updateReportAndArticle = async (req, res, next) => {
     
     const moderator_id = req.user.id; 
 
-    if (action !== 'accept' && action !== 'reject') {
+    if (action !== ActionResoluntionReportEnum.ACCEPT && action !== ActionResoluntionReportEnum.REJECT) {
             return res.status(StatusCodes.BAD_REQUEST).json({ message: "Acción no válida" });
     };
 
@@ -199,23 +200,23 @@ const updateReportAndArticle = async (req, res, next) => {
         const reportDetail = await ReportsModel.selectReportPendingArticle(report_id);
         if (!reportDetail) {
             await connection.rollback();
-            return res.status(StatusCodes.NOT_FOUND).json({ message: "Detalle del Reporte no encontrado." });
+            return res.status(StatusCodes.NOT_FOUND).json({ message: "El reporte que quiere resolver no existe o ha sido resuelto." });
         };
 
         // Obtener los campos necesarios para la actulizacion del estado del articulo y la creacion de la notificacion
         const { seller_id, article_id, title: article_title, previous_status} = reportDetail;
 
         // Actualizar el estado del artículo.
-        if (action === 'accept') {
+        if (action === ActionResoluntionReportEnum.ACCEPT) {
             // El moderador lo retira definitivamente: previous_status pasa a ser NULL
             await ArticlesModel.updateReportArticleStatus(
                 connection, 
                 {   article_id : article_id,
-                    new_status : 'Retirado',
+                    new_status : ArticleStatusEnum.ARCHIVED,
                     new_previous_status : null
                 }
             );
-        } else if (action === 'reject') {
+        } else if (action === ActionResoluntionReportEnum.REJECT) {
             // El moderador desestima el reporte: vuelve a su estado original y limpiamos el histórico
             await ArticlesModel.updateReportArticleStatus(
                 connection, 
@@ -242,9 +243,13 @@ const updateReportAndArticle = async (req, res, next) => {
 
         await connection.commit();
 
-        return res.status(StatusCodes.OK)
-        .json({ message: `Reporte resuelto correctamente. El artículo ha sido ${action === 'accept' ? 'retirado' : 'restaurado'}.`});
-
+        return res.status(StatusCodes.OK).json({ 
+            message: `Reporte resuelto correctamente. El artículo ha sido ${
+                action === ActionResoluntionReportEnum.ACCEPT 
+                    ? ArticleStatusEnum.ARCHIVED 
+                    : `devuelto a su estado original (${previous_status})`
+            }.`
+        });
 
     }catch (error) {
         await connection.rollback(); // Si ocurre cualquier error deshacemos todo lo realizado para manterner consistentes los datos.
@@ -269,16 +274,16 @@ const getReportsHistory = async (req, res, next) => {
 
 const buildReportNotificationData = (action, article_title, moderator_note) => {
     
-    if (action === 'accept') {
+    if (action === ActionResoluntionReportEnum.ACCEPT) {
         return {
-            notificationType: 'Articulo_Rechazado',
+            notificationType: NotificationTypeEnum.REJECTED,
             notificationContent: `Tu artículo "${article_title}" ha sido retirado definitivamente de la plataforma por infringir las normas comunitarias. Motivo: ${moderator_note}`
         };
     } 
     
-    if (action === 'reject') {
+    if (action === ActionResoluntionReportEnum.REJECT) {
         return {
-            notificationType: 'Articulo_Aprobado',
+            notificationType: NotificationTypeEnum.APPROVED,
             notificationContent: `¡Buenas noticias! Tu artículo "${article_title}" ha sido revisado y se encuentra visible de nuevo. Motivo: ${moderator_note}`
         };
     }
