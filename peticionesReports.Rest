@@ -13,19 +13,20 @@ Content-Type: application/json
 # reportar articulo
 ###
 POST http://localhost:3000/api/reports
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjI5NjI0MywiZXhwIjoxNzgyMjk5ODQzfQ.Ue2ebvTN0lJQ2QqOslLt68FZHa-ZMbEiRQ7qttsC-9w
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjQyMTIwMywiZXhwIjoxNzgyNDI0ODAzfQ.oYQCZn2Un5yhdaWnC_0D_0z8H1jBIXwixXVsWIniWu0
 Content-Type: application/json
 
 {
-  "type": "Articulo",
-  "article_id": 10,
-  "reason": "El precio parece muy bajo, podría ser fraudulento"
+    "type": "Articulo",
+    "article_id": 2,
+    "reason": "Las zapatillas llegaron rotas"
 }
 
 # Obtener reportes pendientes de artículos (Moderador/Administrador)
 ###
-GET http://localhost:3000/api/reports/pending/articles
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMxLCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgyMjk4NzkwLCJleHAiOjE3ODIzMDIzOTB9.wMBKfr1Du9R6a19-smd_F4r8FJZ1TZwm_4oRBMIPBHI
+POST http://localhost:3000/api/reports
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjQyMTIwMywiZXhwIjoxNzgyNDI0ODAzfQ.oYQCZn2Un5yhdaWnC_0D_0z8H1jBIXwixXVsWIniWu0
+Content-Type: application/json 
 
 # Obtener detalle reporte pendiente del artículo (Moderador/Administrador)
 ###
