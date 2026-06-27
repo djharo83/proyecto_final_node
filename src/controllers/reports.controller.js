@@ -64,7 +64,7 @@ const createReport = async (req, res, next) => {
                 );
             }
 
-        } else if (type === ReportTypeEnum.USER) {
+        } else {
             
             if (!reported_user_id) {
                 await connection.rollback();
@@ -199,11 +199,11 @@ const updateReportAndArticle = async (req, res, next) => {
             await ArticlesModel.updateReportArticleStatus(
                 connection, 
                 {   article_id : article_id,
-                    new_status : ArticleStatusEnum.ARCHIVED,
+                    new_status : ArticleStatusEnum.RETIRED,
                     new_previous_status : null
                 }
             );
-        } else if (action === ActionResoluntionReportEnum.REJECT) {
+        } else {
             // El moderador desestima el reporte: vuelve a su estado original y limpiamos el histórico
             await ArticlesModel.updateReportArticleStatus(
                 connection, 
@@ -233,7 +233,7 @@ const updateReportAndArticle = async (req, res, next) => {
         return res.status(StatusCodes.OK).json({ 
             message: `Reporte resuelto correctamente. El artículo ha sido ${
                 action === ActionResoluntionReportEnum.ACCEPT 
-                    ? ArticleStatusEnum.ARCHIVED 
+                    ? ArticleStatusEnum.RETIRED 
                     : `devuelto a su estado original (${previous_status})`
             }.`
         });
@@ -268,14 +268,10 @@ const buildReportNotificationData = (action, article_title, moderator_note) => {
         };
     } 
     
-    if (action === ActionResoluntionReportEnum.REJECT) {
-        return {
-            notificationType: NotificationTypeEnum.APPROVED,
-            notificationContent: `¡Buenas noticias! Tu artículo "${article_title}" ha sido revisado y se encuentra visible de nuevo. Motivo: ${moderator_note}`
-        };
-    }
-
-    return { notificationType: '', notificationContent: '' };
+    return {
+        notificationType: NotificationTypeEnum.APPROVED,
+        notificationContent: `¡Buenas noticias! Tu artículo "${article_title}" ha sido revisado y se encuentra visible de nuevo. Motivo: ${moderator_note}`
+    };
 };
 
 module.exports = { createReport, 

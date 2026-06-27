@@ -12,7 +12,7 @@ const ArticleStatusEnum = Object.freeze({
     DRAFT: 'Borrador',
     PUBLISHED: 'Publicado',
     UNDER_REVIEW: 'En revisión',
-    ARCHIVED: 'Retirado',
+    RETIRED: 'Retirado',
     SOLD: 'Vendido',
     RESERVED: 'Reservado'
 });

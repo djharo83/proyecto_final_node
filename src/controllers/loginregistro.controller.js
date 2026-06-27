@@ -24,7 +24,7 @@ const login = async(req, res) => {
     const user = await LoginRegistroModel.selectByEmail(email)
     if (!user) {
         res.status(401).json({
-            message: 'Error email y/o contraseña 1'
+            message: 'Error email y/o contraseña'
         })
     }
 
@@ -36,11 +36,6 @@ const login = async(req, res) => {
         })
     }
 
-    // res.json({
-    //     message: 'Login correcto',
-    //     token: jwt.sign( {userId: user.id , rol: user.role}, process.env.JWT_SECRET_KEY)
-    // });
-
     res.json({
     message: 'Login correcto',
     token: jwt.sign(
@@ -49,19 +44,9 @@ const login = async(req, res) => {
         { expiresIn: '1h' }
     ),
     role: user.role
-    //usuario: user
 });
 
-
-
-
-
-
-
-
 }
-
-
 
 module.exports = {
     register,login
