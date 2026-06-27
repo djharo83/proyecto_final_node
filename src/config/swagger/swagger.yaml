@@ -655,7 +655,7 @@ paths:
 
   /api/reports/pending/articles:
     get:
-      summary: Reportes pendientes para los artículos
+      summary: Reportes pendientes para los artículos (Accesible Solo para el Moderador o Adminsitrador)
       description: Obtiene los reportes pendientes para los artículos (Accesible Solo para el Moderador o Adminsitrador)
       tags:
         - Reportes
@@ -671,7 +671,7 @@ paths:
 
   /api/reports/pending/articles/{id}:
     get:
-      summary: Detalle del reporte pendiente para un artículo
+      summary: Detalle del reporte pendiente para un artículo (Accesible Solo para el Moderador o Adminsitrador)
       description: Obtiene el detalle de un reporte pendiente para un artículo (Accesible Solo para el Moderador o Adminsitrador)
       tags:
         - Reportes
@@ -694,7 +694,7 @@ paths:
   
   /api/reports/pending/users:
     get:
-      summary: Reportes pendientes para los usuarios
+      summary: Reportes pendientes para los usuarios (Accesible Solo para el Moderador o Adminsitrador)
       description: Obtiene los reportes pendientes para los usuarios (Accesible Solo para el Moderador o Adminsitrador)
       tags:
         - Reportes
@@ -710,7 +710,7 @@ paths:
 
   /api/reports/pending/users/{id}:
     get:
-      summary: Detalle del reporte pendiente para un usuario.
+      summary: Detalle del reporte pendiente para un usuario. (Accesible Solo para el Moderador o Adminsitrador)
       description: Obtiene el detalle del reporte pendiente para un usuario (Accesible Solo para el Moderador o Adminsitrador)
       tags:
         - Reportes
@@ -733,7 +733,7 @@ paths:
 
   /api/reports/history:
     get:
-      summary: Lista de reportes resueltos para articulos y usuarios.
+      summary: Lista de reportes resueltos para articulos y usuarios. (Accesible Solo para el Moderador o Adminsitrador)
       description: Obtiene una lista de reportes resueltos tanto para artículos como para reportes (Accesible Solo para el Moderador o Adminsitrador)
       tags:
         - Reportes
