@@ -15,11 +15,6 @@ const createReport = async (req, res, next) => {
     const { type, article_id, reported_user_id, reason } = req.body;
     const reporter_id = req.user.id;
 
-
-    if (!type || !reason) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El tipo y el motivo son obligatorios' });
-    }
-
     let body = {
         reporter_id,
         type,
@@ -85,10 +80,6 @@ const createReport = async (req, res, next) => {
             }
             
             body.reported_user_id = reported_user_id;
-
-        } else {
-            await connection.rollback();
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: "El tipo debe ser 'Articulo' o 'Usuario'" });
         }
 
         await ReportsModel.insert(connection, body);
@@ -185,10 +176,6 @@ const updateReportAndArticle = async (req, res, next) => {
     const report_id = req.params.id;
     
     const moderator_id = req.user.id; 
-
-    if (action !== ActionResoluntionReportEnum.ACCEPT && action !== ActionResoluntionReportEnum.REJECT) {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: "Acción no válida" });
-    };
 
     const connection = await db.getConnection();
 

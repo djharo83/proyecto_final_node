@@ -10,12 +10,14 @@ const app = express();
 const allowedOrigins = [
     'http://localhost:4200',
     'http://localhost:4000',
+    'http://localhost:3000',
+    'https://proyecto-final-node-js86.onrender.com',
     'https://unir.c4a.com.co'
 ];                                               
 
 const corsOptions = {
     origin: function (dominioEmisor, callback) {
-        // Permitir peticiones sin origen (como Postman, Swagger o herramientas de server-to-server)
+        // Permitir peticiones sin origen (como Postman)
         if (!dominioEmisor) return callback(null, true);
         
         if (allowedOrigins.indexOf(dominioEmisor) !== -1) {
@@ -68,5 +70,4 @@ app.use((err, req, res, next) => {
 
 });
 
-module.exports = app;
-module.exports.allowedOrigins = allowedOrigins;
+module.exports = {app, allowedOrigins };

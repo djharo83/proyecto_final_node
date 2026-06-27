@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { validateSchema } = require('../../middlewares/validation.middleware');
-const { reportSchema } = require('../../schemas/reports.schema');
+const { reportSchema, updateReportSchema } = require('../../schemas/reports.schema');
 
 // Rutas de /api/reports
 
@@ -24,7 +24,7 @@ router.get('/pending/articles', checkToken, checkRole(['Moderador', 'Administrad
 router.get('/pending/users', checkToken, checkRole(['Moderador', 'Administrador']), getReportsPendingUsers);
 router.get('/pending/articles/:id', checkToken, checkRole(['Moderador', 'Administrador']), getReportPendingArticle);
 router.get('/pending/users/:id', checkToken, checkRole(['Moderador', 'Administrador']), getReportPendingUser);
-router.put('/resolution/:id', checkToken, checkRole(['Moderador', 'Administrador']), updateReportAndArticle);
+router.put('/resolution/:id', checkToken, checkRole(['Moderador', 'Administrador']), validateSchema(updateReportSchema), updateReportAndArticle);
 router.get('/history', checkToken, checkRole(['Moderador', 'Administrador']), getReportsHistory);
 
 module.exports = router;
