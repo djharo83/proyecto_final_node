@@ -1138,6 +1138,52 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /api/notifications/user:
+    get:
+      summary: Obtiene las notificaciones no leidas de un usuario.
+      description: Servicio para obtener las notificaciones no leidas sobre los articulos de un usuario.
+      security:
+        - bearerAuth: []
+      tags:
+        - Notificaciones
+      responses:
+        '200':
+          description: Lista de notificaciones no leidas de un usuario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsUserResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications/{id}/read:
+    put:
+      summary: Actualiza la notificacion de un usuario a leida.
+      description: Servicio para actualizar como leida una notificacion del usuario.
+      security:
+        - bearerAuth: []
+      tags:
+        - Notificaciones
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notificación marcada como leída.
+        '204':
+          description: La notificación solicitada no existe.
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+## Componentes
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1170,6 +1216,8 @@ components:
               message:
                 type: string
                 example: Error interno del servidor
+
+  ## schemas
 
   schemas:
     FavoritesArticleResponse:
@@ -1590,3 +1638,40 @@ components:
               reporter_username:
                 type: string
                 example: diego_vende
+
+    ## Notificaciones
+    
+    NotificationsUserResponse:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 19
+              user_id:
+                type: integer
+                example: 51
+              type:
+                type: string
+                example: Articulo_Rechazado
+              content:
+                type: string
+                example: 'Tu artículo "Clean Code - Robert C. Martin" ha sido retirado definitivamente de la plataforma por infringir las normas comunitarias.
+              reference_id:
+                type: integer
+                example: 10
+              is_read:
+                type: integer
+                example: 0
+              created_at:
+                type: string
+                format: date-time
+                example: '2026-06-27T14:22:17.000Z'
+              updated_at:
+                type: string
+                format: date-time
+                example: '2026-06-28T08:59:30.000Z'

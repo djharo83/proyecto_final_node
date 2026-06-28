@@ -3,6 +3,7 @@ const router = require('express').Router();
 // Rutas Diego
 router.use('/categories', require('./api/categories'));
 router.use('/favorites', require('./api/favorites'));
+router.use('/notifications', require('./api/notifications'));
 
 // Rutas Jose 
 router.use('/users',require('./api/users'));
