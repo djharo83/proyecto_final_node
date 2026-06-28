@@ -1,5 +1,7 @@
 
 const db = require('../config/db');
+const { ReportTypeEnum, ReportStatusEnum } = require("../constants/enums.js"); 
+
 
 // Usuario
 const insert = async (conection, body) => {
@@ -27,7 +29,7 @@ const selectReportsPendingArticles = async () => {
         FROM reports r
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
         INNER JOIN articles a ON r.article_id = a.id
-        WHERE r.status = 'Pendiente' AND r.type = 'Articulo'
+        WHERE r.status = '${ReportStatusEnum.PENDING}' AND r.type = '${ReportTypeEnum.ARTICLE}'
         ORDER BY r.created_at DESC`;
 
     const [result] = await db.query(query);
@@ -55,8 +57,8 @@ const selectReportPendingArticle = async (report_id) => {
     LEFT JOIN article_photos ap ON ap.article_id = a.id
     INNER JOIN users u_seller ON a.user_id = u_seller.id 
     WHERE r.id = ?
-    AND r.status = 'Pendiente' 
-    AND r.type = 'Articulo'
+    AND r.status = '${ReportStatusEnum.PENDING}' 
+    AND r.type = '${ReportTypeEnum.ARTICLE}'
     GROUP BY r.id, a.id`;
 
     const [result] = await db.query(query, [report_id]);
@@ -86,7 +88,7 @@ const selectReportsPendingUsers = async () => {
         FROM reports r
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
         INNER JOIN users u_reported ON r.reported_user_id = u_reported.id
-        WHERE r.status = 'Pendiente' AND r.type = 'Usuario'
+        WHERE r.status = '${ReportStatusEnum.PENDING}' AND r.type = '${ReportTypeEnum.USER}'
         ORDER BY r.created_at DESC`;
 
     const [result] = await db.query(query);
@@ -111,8 +113,8 @@ const selectReportPendingUser = async (report_id) => {
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
         INNER JOIN users u_reported ON r.reported_user_id = u_reported.id
         WHERE r.id = ?
-        AND r.status = 'Pendiente'
-        AND r.type = 'Usuario'`;
+        AND r.status = '${ReportStatusEnum.PENDING}'
+        AND r.type = '${ReportTypeEnum.USER}'`;
 
     const [result] = await db.query(query, [report_id]);
     
@@ -132,7 +134,7 @@ const selectReportsHistory = async () => {
         FROM reports r
         INNER JOIN users u_mod ON r.moderator_id = u_mod.id
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
-        WHERE r.status = 'Resuelto'
+        WHERE r.status = '${ReportStatusEnum.RESOLVED}'
         ORDER BY r.resolved_at DESC`;
 
     const [result] = await db.query(query);
@@ -140,16 +142,16 @@ const selectReportsHistory = async () => {
     return result;
 }
 
-const updateReport = async (connection, {moderator_id, moderator_note, report_id}) => {
+const updateReport = async (connection, {moderator_id, moderator_note, article_id}) => {
 
     let query = `UPDATE reports 
-            SET status = 'Resuelto',
+            SET status = '${ReportStatusEnum.RESOLVED}',
                 moderator_id = ?,
                 moderator_note = ?,
                 resolved_at = NOW()
-            WHERE id = ?`;
+            WHERE article_id = ?`;
 
-    const [result] = await connection.query(query, [moderator_id, moderator_note, report_id]);
+    const [result] = await connection.query(query, [moderator_id, moderator_note, article_id]);
   
     return result;
 

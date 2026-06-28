@@ -7,7 +7,7 @@ const getAll = async (req, res) => {
         res.json(clientes);
     } catch(error){
         res.status(500).json({
-            message: 'Hay un error gravvisimo'
+            message: 'Error interno del servidor'
         });
     }
 }

@@ -4,17 +4,16 @@ const ArticlesModel = require("../models/articles.model");
 const NotificationsModel =  require("../models/notifications.model"); 
 const { StatusCodes } = require("http-status-codes");
 const db = require('../config/db');
+const { ReportTypeEnum, 
+        ActionResoluntionReportEnum, 
+        ArticleStatusEnum, 
+        NotificationTypeEnum } = require("../constants/enums.js"); 
 
 // Usuarios 
 const createReport = async (req, res, next) => {
     
     const { type, article_id, reported_user_id, reason } = req.body;
     const reporter_id = req.user.id;
-
-
-    if (!type || !reason) {
-        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El tipo y el motivo son obligatorios' });
-    }
 
     let body = {
         reporter_id,
@@ -31,7 +30,7 @@ const createReport = async (req, res, next) => {
     
         await connection.beginTransaction();
 
-        if (type === 'Articulo') {
+        if (type === ReportTypeEnum.ARTICLE) {
 
             if (!article_id) {
                 await connection.rollback();
@@ -44,24 +43,28 @@ const createReport = async (req, res, next) => {
             
             body.article_id = article_id;
 
-            //Mover el artículo a 'En revisión' automáticamente al recibir el reporte
-            // Guardamos el estado actual en 'previous_status' antes de sobreescribir 'status'
-            const articleStatus = await ArticlesModel.getArticleStatus(article_id);
+            // Obtener la información necesaria para actualizar el artículo
+            const articleStatus = await ArticlesModel.getArticleStatus(connection, article_id);
 
             if (!articleStatus) {
                 await connection.rollback();
-                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo no existe'});
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo que quiere reportar no existe o ha sido resuelto'});
             }
 
-            await ArticlesModel.updateReportArticleStatus(
-                connection, 
-                {   article_id : article_id,
-                    new_status : 'En revisión',
-                    new_previous_status : articleStatus
-                }
-            );
+            // Si el artículo ya está 'En revisión', no hacemos lógica de actualización de estados, 
+            // pero SÍ permitimos que se inserte el reporte para que el moderador tenga constancia.
+            if (articleStatus !== ArticleStatusEnum.UNDER_REVIEW) {
+                await ArticlesModel.updateReportArticleStatus(
+                    connection, 
+                    {   
+                        article_id : article_id,
+                        new_status : ArticleStatusEnum.UNDER_REVIEW,
+                        new_previous_status : articleStatus // Guardamos el estado actual del artículo
+                    }
+                );
+            }
 
-        } else if (type === 'Usuario') {
+        } else {
             
             if (!reported_user_id) {
                 await connection.rollback();
@@ -77,10 +80,6 @@ const createReport = async (req, res, next) => {
             }
             
             body.reported_user_id = reported_user_id;
-
-        } else {
-            await connection.rollback();
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: "El tipo debe ser 'Articulo' o 'Usuario'" });
         }
 
         await ReportsModel.insert(connection, body);
@@ -178,10 +177,6 @@ const updateReportAndArticle = async (req, res, next) => {
     
     const moderator_id = req.user.id; 
 
-    if (action !== 'accept' && action !== 'reject') {
-            return res.status(StatusCodes.BAD_REQUEST).json({ message: "Acción no válida" });
-    };
-
     const connection = await db.getConnection();
 
     try{
@@ -192,23 +187,23 @@ const updateReportAndArticle = async (req, res, next) => {
         const reportDetail = await ReportsModel.selectReportPendingArticle(report_id);
         if (!reportDetail) {
             await connection.rollback();
-            return res.status(StatusCodes.NOT_FOUND).json({ message: "Detalle del Reporte no encontrado." });
+            return res.status(StatusCodes.NOT_FOUND).json({ message: "El reporte que quiere resolver no existe o ha sido resuelto." });
         };
 
         // Obtener los campos necesarios para la actulizacion del estado del articulo y la creacion de la notificacion
         const { seller_id, article_id, title: article_title, previous_status} = reportDetail;
 
         // Actualizar el estado del artículo.
-        if (action === 'accept') {
+        if (action === ActionResoluntionReportEnum.ACCEPT) {
             // El moderador lo retira definitivamente: previous_status pasa a ser NULL
             await ArticlesModel.updateReportArticleStatus(
                 connection, 
                 {   article_id : article_id,
-                    new_status : 'Retirado',
+                    new_status : ArticleStatusEnum.RETIRED,
                     new_previous_status : null
                 }
             );
-        } else if (action === 'reject') {
+        } else {
             // El moderador desestima el reporte: vuelve a su estado original y limpiamos el histórico
             await ArticlesModel.updateReportArticleStatus(
                 connection, 
@@ -220,7 +215,7 @@ const updateReportAndArticle = async (req, res, next) => {
         }
         
         // Actualizar el reporte a 'Resuelto'
-        await ReportsModel.updateReport(connection, {moderator_id, moderator_note, report_id});
+        await ReportsModel.updateReport(connection, {moderator_id, moderator_note, article_id});
 
         // Crear la notificacion para informar al usuario de la resolucion del reporte
         const { notificationType, notificationContent } = buildReportNotificationData(action, article_title, moderator_note)
@@ -235,9 +230,13 @@ const updateReportAndArticle = async (req, res, next) => {
 
         await connection.commit();
 
-        return res.status(StatusCodes.OK)
-        .json({ message: `Reporte resuelto correctamente. El artículo ha sido ${action === 'accept' ? 'retirado' : 'restaurado'}.`});
-
+        return res.status(StatusCodes.OK).json({ 
+            message: `Reporte resuelto correctamente. El artículo ha sido ${
+                action === ActionResoluntionReportEnum.ACCEPT 
+                    ? ArticleStatusEnum.RETIRED 
+                    : `devuelto a su estado original (${previous_status})`
+            }.`
+        });
 
     }catch (error) {
         await connection.rollback(); // Si ocurre cualquier error deshacemos todo lo realizado para manterner consistentes los datos.
@@ -262,21 +261,17 @@ const getReportsHistory = async (req, res, next) => {
 
 const buildReportNotificationData = (action, article_title, moderator_note) => {
     
-    if (action === 'accept') {
+    if (action === ActionResoluntionReportEnum.ACCEPT) {
         return {
-            notificationType: 'Articulo_Rechazado',
+            notificationType: NotificationTypeEnum.REJECTED,
             notificationContent: `Tu artículo "${article_title}" ha sido retirado definitivamente de la plataforma por infringir las normas comunitarias. Motivo: ${moderator_note}`
         };
     } 
     
-    if (action === 'reject') {
-        return {
-            notificationType: 'Articulo_Aprobado',
-            notificationContent: `¡Buenas noticias! Tu artículo "${article_title}" ha sido revisado y se encuentra visible de nuevo. Motivo: ${moderator_note}`
-        };
-    }
-
-    return { notificationType: '', notificationContent: '' };
+    return {
+        notificationType: NotificationTypeEnum.APPROVED,
+        notificationContent: `¡Buenas noticias! Tu artículo "${article_title}" ha sido revisado y se encuentra visible de nuevo. Motivo: ${moderator_note}`
+    };
 };
 
 module.exports = { createReport, 

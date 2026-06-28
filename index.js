@@ -3,9 +3,8 @@ require("dotenv").config();
 
 // Server creation and configuration
 const http = require("node:http");
-const app = require("./src/app");
+const { app, allowedOrigins } = require("./src/app");
 const socketIO = require('socket.io'); 
-const { allowedOrigins } = require('./src/app');
 const MessagesModel = require('./src/models/messages.model');
 
 
@@ -23,11 +22,7 @@ server.listen(PORT);
 const io = socketIO(server, {
     cors: {
         // Ponemos los mismos orígenes que hay ahora mismo en  app.js
-        origin: [
-            'http://localhost:4200',                  
-            'http://localhost:4000',                  
-            'https://unir.c4a.com.co'
-        ],
+        origin: allowedOrigins,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
     }
 });
