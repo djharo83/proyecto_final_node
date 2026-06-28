@@ -1660,7 +1660,7 @@ components:
                 example: Articulo_Rechazado
               content:
                 type: string
-                example: 'Tu artículo "Clean Code - Robert C. Martin" ha sido retirado definitivamente de la plataforma por infringir las normas comunitarias.
+                example: 'Tu artículo Zapatillas Blancas ha sido retirado definitivamente de la plataforma por infringir las normas comunitarias.'
               reference_id:
                 type: integer
                 example: 10
