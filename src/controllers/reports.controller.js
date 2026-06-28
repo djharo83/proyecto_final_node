@@ -230,6 +230,19 @@ const updateReportAndArticle = async (req, res, next) => {
 
         await connection.commit();
 
+        // Notificación en tiempo real para el usuario
+        const io = req.app.get('io'); // Esto es posible recuperar la instancia del webSocket porque en index hemos compartido la instanci app.set('io', io); y podemos recuperarla en el controlador
+        if (io) {
+            const userRoom = `user_${seller_id}`;
+            io.to(userRoom).emit('new_notification', {
+                type: notificationType,
+                content: notificationContent,
+                reference_id: article_id,
+                created_at: new Date()
+            });
+            console.log(`Notificación enviada por Socket al canal: ${userRoom}`);
+        }
+
         return res.status(StatusCodes.OK).json({ 
             message: `Reporte resuelto correctamente. El artículo ha sido ${
                 action === ActionResoluntionReportEnum.ACCEPT 

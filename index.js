@@ -11,12 +11,17 @@ const MessagesModel = require('./src/models/messages.model');
 // Server creation
 const server = http.createServer(app);
 
-
 // Listeners
+server.on("listening", () => {
+    console.log(`Server listening on port ${PORT}`);
+});
+
+server.on("error", (error) => {
+    console.error("Error en el servidor:", error);
+});
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT);
-
-
 
 // Configuración del web socket
 const io = socketIO(server, {
@@ -27,13 +32,17 @@ const io = socketIO(server, {
     }
 });
 
+// Notificaciones Moderador Compartimos la instancia de socket.io con Express.
+app.set('io', io);
+
 // Eventos socket
 const SOCKET_EVENTS = {
     CONNECTION: 'connection',
     DISCONNECT: 'disconnect',
     JOIN_CHAT: 'join_chat',
     PRIVATE_MESSAGE: 'private_message',
-    NEW_MESSAGE: 'new_message'
+    NEW_MESSAGE: 'new_message',
+    JOIN_USER_ROOM: 'join_user_room' // Notificaciones Evento para la sala del usuario
 };
 
 
@@ -41,6 +50,13 @@ const SOCKET_EVENTS = {
 // Escuchamos el evento de conexión
 io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
     console.log(`Se ha conectado un nuevo cliente: ${socket.id}`);
+
+    // Notificaciones - Escuchar cuando un usuario se conecta a su canal de notificaciones único .
+    socket.on(SOCKET_EVENTS.JOIN_USER_ROOM, (userId) => {
+        const userRoom = `user_${userId}`;
+        socket.join(userRoom);
+        console.log(`Usuario con ID ${userId} se ha unido a su sala de notificaciones: ${userRoom}`);
+    });
 
     // 1. Unirse a la sala
     socket.on(SOCKET_EVENTS.JOIN_CHAT, (conversationId) => {
@@ -75,13 +91,3 @@ io.on(SOCKET_EVENTS.CONNECTION, (socket) => {
     });
 });
 
-
-
-// Listeners
-server.on("listening", () => {
-    console.log(`Server listening on port ${PORT}`);
-});
-
-server.on("error", (error) => {
-    console.log(error);
-});
