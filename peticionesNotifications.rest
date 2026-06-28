@@ -1,0 +1,7 @@
+### Obtener todos los favoritos de un usuario
+GET http://localhost:3000/api/notifications/user
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjY0NDM5OCwiZXhwIjoxNzgyNjQ3OTk4fQ.hLnFlYxmNGpaMfB1d6Mjt8skBtt7pv-2FYHDT6cD2Gc
+
+#### Obtener favorito por ID
+PUT http://localhost:3000/api/notifications/10/read
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUxLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjY0NDM5OCwiZXhwIjoxNzgyNjQ3OTk4fQ.hLnFlYxmNGpaMfB1d6Mjt8skBtt7pv-2FYHDT6cD2Gc
