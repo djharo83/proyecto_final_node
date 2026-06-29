@@ -54,16 +54,28 @@ const checkRole = (roles) => {
     }
 }
 
-// Comprueba si el usuario autenticado es el creador del artículo
+// Comprueba si el usuario autenticado es el creador del artículo o tiene rol de moderación o administrador
 const isOwner = async (req, res, next) => {
     try {
         // Como 'checkArticleId' se ejecutará justo antes en la ruta, ya tenemos el artículo aquí:
         const article = req.article; 
 
-        if (article.user_id !== req.user.id) {
-            return res.status(403).json({ message: 'Acceso denegado: No eres el propietario de este artículo' });
+        // 1. Si el usuario es el dueño legítimo, le dejamos pasar
+        if (article.user_id === req.user.id) {
+            return next();
         }
-        next();
+
+        // 2. Si no es el dueño, comprobamos si es Moderador o Administrador
+        const rolesPrivilegiados = ['Moderador', 'Administrador'];
+        if (rolesPrivilegiados.includes(req.user.role)) {
+            return next(); 
+        }
+
+        // 3. Si no es el dueño ni tiene rol privilegiado, denegamos el acceso
+        return res.status(403).json({ 
+            message: 'Acceso denegado: No eres el propietario de este artículo ni tienes permisos de moderación' 
+        });
+
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
