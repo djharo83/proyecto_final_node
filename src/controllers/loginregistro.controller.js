@@ -48,6 +48,32 @@ const login = async(req, res) => {
 
 }
 
+const changePassword = async (req, res) => {
+    // El userId viene del token
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+
+    // Obtenemos el usuario para comprobar su contraseña actual
+    const user = await LoginRegistroModel.selectById(userId);
+    if (!user) {
+        return res.status(404).json({ message: 'El usuario no existe' });
+    }
+
+    // ¿Coincide la contraseña actual?
+    const iguales = bcrypt.compareSync(currentPassword, user.password_hash);
+    if (!iguales) {
+        return res.status(401).json({ message: 'La contraseña actual no es correcta' });
+    }
+
+    // Encriptamos y guardamos la nueva contraseña
+    const newPasswordHash = bcrypt.hashSync(newPassword, 8);
+    await LoginRegistroModel.updatePassword(userId, newPasswordHash);
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+}
+
+
+
 module.exports = {
-    register,login
+    register,login,changePassword
 }

@@ -1,4 +1,5 @@
 const AdminModel = require('../models/admin.model');
+const bcrypt = require('bcryptjs');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -104,5 +105,24 @@ const getStats = async (req, res) => {
     }
 }
 
+const changeUserPassword = async (req, res) => {
+    const { userId } = req.params;
+    const { newPassword } = req.body;
 
-module.exports = { getAllUsers, getUserById, changeRole, blockUser, unblockUser, removeUser, editUser, getStats };
+    if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ message: 'La nueva contraseña debe tener al menos 6 caracteres' });
+    }
+
+    const user = await AdminModel.selectById(userId);
+    if (!user) {
+        return res.status(404).json({ message: 'El usuario no existe con ese ID' });
+    }
+
+    const newPasswordHash = bcrypt.hashSync(newPassword, 8);
+    await AdminModel.updatePassword(userId, newPasswordHash);
+
+    res.json({ message: `Contraseña del usuario ${user.username} actualizada correctamente` });
+}
+
+
+module.exports = { getAllUsers, getUserById, changeRole, blockUser, unblockUser, removeUser, editUser, getStats , changeUserPassword};

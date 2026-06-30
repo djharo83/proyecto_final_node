@@ -79,3 +79,14 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoi
 
 GET http://localhost:3000/api/admin/stats
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxNzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+
+### cambiar contraseña de un ususario
+
+PUT http://localhost:3000/api/admin/users/6/password
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MjgzODg5MiwiZXhwIjoxNzgyODQyNDkyfQ.NEgZSM_xelgYs8TKTqR10wGqWXNPAtJZ8t0Vt-MRXLQ
+Content-Type: application/json
+
+{
+    "newPassword": "Chorizo321"
+}
