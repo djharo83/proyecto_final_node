@@ -30,7 +30,7 @@ const selectReportsPendingArticles = async () => {
         INNER JOIN users u_reporter ON r.reporter_id = u_reporter.id
         INNER JOIN articles a ON r.article_id = a.id
         WHERE r.status = '${ReportStatusEnum.PENDING}' AND r.type = '${ReportTypeEnum.ARTICLE}'
-        ORDER BY r.created_at DESC`;
+        ORDER BY a.id ASC, r.created_at DESC`;
 
     const [result] = await db.query(query);
     
