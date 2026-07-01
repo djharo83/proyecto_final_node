@@ -55,8 +55,8 @@ const getMyArticles = async (req, res) => {
         // El ID del usuario lo obtenemos inyectado por checkToken
         const loggedUserId = req.user.id;
         
-        // Llamamos al modelo pasándole el user_id para filtrar solo los suyos
-        const articles = await ArticlesModel.getAll(page, pageSize, { user_id: loggedUserId });
+        // Llamamos a la  función que trae los artículos del usuario logueado (todos los datos: publicados, borradores, vendidos, etc.)
+        const articles = await ArticlesModel.getByUserId(page, pageSize, loggedUserId);
         
         res.json({
             info: { page, pageSize, count: articles.length },

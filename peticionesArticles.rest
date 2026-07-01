@@ -6,7 +6,7 @@
 ##Usuario id 23, rol Usuario
 @TOKEN_USER=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIzLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MTI4NDQ0NywiZXhwIjoxNzgxMzcwODQ3fQ.rySeIP2rRUA9KDuDBosYOIAQBRfgkEErivVNnNJu50Q
 
-
+@TOKEN_ADMIN =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjkzODgyOCwiZXhwIjoxNzgyOTQyNDI4fQ.RHpApL7W3CiWuvmWE3pesuyR4w2tGC9Hp2bdqOh-bqY
 
 
 ### 1. Obtener primera página (Por defecto trae 10 artículos)
@@ -182,3 +182,25 @@ Content-Type: application/json
 {
   "status": "Vendido"
 }
+
+###
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "Ignacio30@gmail.com",
+    "password": "chorizo"
+}
+
+###
+PATCH http://localhost:3000/api/articles/46/status
+Authorization: {{TOKEN_ADMIN}}
+Content-Type: application/json
+
+{
+  "status": "Borrador"
+}
+
+###
+GET http://localhost:3000/api/articles/user/me
+Authorization: {{TOKEN_ADMIN}}

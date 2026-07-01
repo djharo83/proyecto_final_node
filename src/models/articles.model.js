@@ -83,7 +83,25 @@ const getById = async (id) => {
     return article;
 };
 
-// 3. Crear artículo secuencialmente (Estilo clase)
+
+// 3. Función para traer todos los articulos de un usuario específico (con paginación)
+const getByUserId = async (page = 1, pageSize = 10, userId) => {
+    const offset = (page - 1) * pageSize;
+    
+    let query = `
+        SELECT a.*, p.url as main_photo 
+        FROM articles a 
+        LEFT JOIN article_photos p ON a.id = p.article_id AND p.\`order\` = 0
+        WHERE a.user_id = ?
+        ORDER BY a.created_at DESC 
+        LIMIT ? OFFSET ?
+    `;
+
+    const [result] = await db.query(query, [Number(userId), Number(pageSize), Number(offset)]);
+    return result;
+};
+
+// 4. Crear artículo secuencialmente (Estilo clase)
 const create = async (articleData, photoUrls) => {
     const { user_id, category_id, title, description, price, condition, location } = articleData;
 
@@ -110,7 +128,7 @@ const create = async (articleData, photoUrls) => {
 };
 
 
-// 4. Modificar los datos generales de un artículo y devolverlo actualizado
+// 5. Modificar los datos generales de un artículo y devolverlo actualizado
 const updateById = async (id, articleData) => {
     const { title, description, price, condition, location, category_id } = articleData;
     
@@ -126,7 +144,7 @@ const updateById = async (id, articleData) => {
     return await getById(id);
 };
 
-// 5. Cambiar únicamente el estado y devolver el artículo actualizado
+// 6. Cambiar únicamente el estado y devolver el artículo actualizado
 const updateStatus = async (id, newStatus) => {
 
     // 1. Obtenemos el artículo actual para saber su status antes de cambiarlo
@@ -144,7 +162,7 @@ const updateStatus = async (id, newStatus) => {
 };
 
 
-// 6. Eliminar artículo y sus fotos asociadas
+// 7. Eliminar artículo y sus fotos asociadas
 const deleteById = async (id) => {
     // A. Borramos las fotos asociadas de la tabla secundaria
     await db.query("DELETE FROM article_photos WHERE article_id = ?", [id]);
@@ -155,7 +173,7 @@ const deleteById = async (id) => {
     return result.affectedRows > 0;
 };
 
-// Consulta para favoritos
+// 8.Consulta para favoritos
 const existsArticleById = async(id) => {
 
     const [rows] = await db.query("SELECT EXISTS(SELECT 1 FROM articles WHERE id = ?) AS existe", [id]);
@@ -164,7 +182,7 @@ const existsArticleById = async(id) => {
 
 }
 
-// Usuarios/Moderador
+// 9.Usuarios/Moderador
 const updateReportArticleStatus = async (connection, {article_id, new_status, new_previous_status}) => {
     const query = `
         UPDATE articles 
@@ -176,9 +194,11 @@ const updateReportArticleStatus = async (connection, {article_id, new_status, ne
     return result;
 };
 
+// 10. Obtener el estado de un artículo por su ID
 const getArticleStatus = async(connection, article_id) => {
     const [result] = await connection.query("SELECT ar.status FROM articles ar WHERE ar.id = ?", [article_id]);
     return result[0] ? result[0].status : null;
 }
 
-module.exports = { getAll, getById, updateById, updateStatus, create, deleteById, existsArticleById, updateReportArticleStatus, getArticleStatus };
+module.exports = { getAll, getById, getByUserId,updateById, updateStatus, create, deleteById, existsArticleById, updateReportArticleStatus, getArticleStatus };
+    
