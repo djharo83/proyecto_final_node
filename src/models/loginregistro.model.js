@@ -38,6 +38,14 @@ const insert = async({username, email, password}) => {
     return result;
 }
 
+const updatePassword = async (userId, newPasswordHash) => {
+    const [result] = await db.query(
+        'UPDATE users SET password_hash = ? WHERE id = ?',
+        [newPasswordHash, userId]
+    );
+    return result;
+}
 
 
-module.exports = {selectAll,selectById,insert,selectByEmail};
+
+module.exports = {selectAll,selectById,insert,selectByEmail, updatePassword};

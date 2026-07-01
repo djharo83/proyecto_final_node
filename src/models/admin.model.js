@@ -71,6 +71,14 @@ const getStats = async () => {
     };
 }
 
+const updatePassword = async (userId, newPasswordHash) => {
+    const [result] = await db.query(
+        'UPDATE users SET password_hash = ? WHERE id = ?',
+        [newPasswordHash, userId]
+    );
+    return result;
+}
 
 
-module.exports = { selectAll, selectById, updateRole, updateStatus, deleteById, updateById,getStats };
+
+module.exports = { selectAll, selectById, updateRole, updateStatus, deleteById, updateById,getStats, updatePassword };

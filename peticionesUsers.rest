@@ -15,8 +15,8 @@ POST http://localhost:3000/api/users/register
 Content-Type: application/json
 
 {
-    "username": "pruebadelschema",
-    "email": "Schema@gmail.com",
+    "username": "prueba_cambioContraseña",
+    "email": "pruebacambioContrasena@gmail.com",
     "password":"chorizo"
 }
 
@@ -26,10 +26,20 @@ POST http://localhost:3000/api/users/login
 Content-Type: application/json
 
 {
-    "email": "Schema@gmail.com",
-    "password":"chorizo"
+    "email": "pedro@email.com",
+    "password":"Chorizo321"
 }
 
+
+### Cambio de contraseña ##
+PUT http://localhost:3000/api/users/change-password
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYwLCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MjgzODMzOSwiZXhwIjoxNzgyODQxOTM5fQ.Rbw6GQ4EFhcl3pPQJc69pjp4WtNLj0YWW1D8fkHXvWY
+Content-Type: application/json
+
+{
+    "currentPassword": "chorizo",
+    "newPassword": "Manzana"
+}
 
 ###EDITAR DATOS USUARIO###
 ###

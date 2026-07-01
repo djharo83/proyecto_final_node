@@ -523,15 +523,6 @@ paths:
           description: La cuenta del usuario está bloqueada.
 
   /api/users/profile:
-    get:
-      summary: Obtiene el perfil del usuario autenticado
-      tags:
-        - Usuarios
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Datos del usuario autenticado.
     put:
       summary: Editar el perfil del usuario autenticado
       tags:
@@ -556,6 +547,49 @@ paths:
       responses:
         '200':
           description: Actualizado.
+
+  /api/users/change-password:
+    put:
+      summary: Cambia la contraseña del usuario autenticado
+      description: El usuario debe indicar su contraseña actual para verificarla antes de guardar la nueva. El userId se obtiene automáticamente del token, por lo que nadie puede cambiar la contraseña de otro usuario.
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  example: "Test1234!"
+                newPassword:
+                  type: string
+                  minLength: 6
+                  example: "NuevaPass123!"
+      responses:
+        '200':
+          description: Contraseña actualizada correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Contraseña actualizada correctamente"
+        '401':
+          description: La contraseña actual no es correcta.
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: El usuario no existe.
 
   /api/users/{userId}:
     get:
@@ -1034,6 +1068,52 @@ paths:
         '403':
           description: Acceso denegado, requiere rol Administrador.
 
+  /api/admin/users/{userId}/password:
+    put:
+      summary: Cambia la contraseña de cualquier usuario
+      description: Permite al Administrador establecer una nueva contraseña para cualquier usuario sin necesidad de conocer la contraseña actual. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  minLength: 6
+                  example: "NuevaPass123!"
+      responses:
+        '200':
+          description: Contraseña del usuario actualizada correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Contraseña del usuario laura_moda actualizada correctamente"
+        '400':
+          description: La nueva contraseña no cumple los requisitos mínimos.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
   /api/conversations:
     get:
       summary: Obtener la bandeja de entrada (inbox) del usuario autenticado
@@ -1182,8 +1262,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-## Componentes
-
 components:
   securitySchemes:
     bearerAuth:
@@ -1216,8 +1294,6 @@ components:
               message:
                 type: string
                 example: Error interno del servidor
-
-  ## schemas
 
   schemas:
     FavoritesArticleResponse:
@@ -1425,7 +1501,6 @@ components:
           format: date-time
           example: "2026-06-20T17:18:25.000Z"
 
-    ## Reportes
     ReportsArticlesResponse:
       type: object
       properties:
@@ -1639,8 +1714,6 @@ components:
                 type: string
                 example: diego_vende
 
-    ## Notificaciones
-    
     NotificationsUserResponse:
       type: object
       properties:
