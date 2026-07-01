@@ -13,7 +13,7 @@ const allowedOrigins = [
     'http://localhost:3000',
     'https://proyecto-final-node-js86.onrender.com',
     'https://unir-grupo-1.vercel.app',
-    'https://fronttfm.vercel.app'
+    'https://fronttfm.vercel.app',
     'https://unir.c4a.com.co'
 ];                                               
 
