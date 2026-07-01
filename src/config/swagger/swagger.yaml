@@ -523,15 +523,6 @@ paths:
           description: La cuenta del usuario está bloqueada.
 
   /api/users/profile:
-    get:
-      summary: Obtiene el perfil del usuario autenticado
-      tags:
-        - Usuarios
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Datos del usuario autenticado.
     put:
       summary: Editar el perfil del usuario autenticado
       tags:
