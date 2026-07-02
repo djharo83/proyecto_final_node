@@ -46,8 +46,7 @@ const createReport = async (req, res, next) => {
             // Obtener la información necesaria para actualizar el artículo
             const articleInfo = await ArticlesModel.getArticleInfo(connection, article_id);
 
-
-            if (!articleInfo || articleInfo.status === ArticleStatusEnum.RESOLVED) { // O el enum que uses para resuelto
+            if (!articleInfo || articleInfo.status === ArticleStatusEnum.RETIRED) {
                 await connection.rollback();
                 return res.status(StatusCodes.BAD_REQUEST).json({ 
                     message: 'El articulo que quiere reportar no existe o ya ha sido resuelto por el moderador.'
