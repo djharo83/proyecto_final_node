@@ -194,11 +194,11 @@ const updateReportArticleStatus = async (connection, {article_id, new_status, ne
     return result;
 };
 
-// 10. Obtener el estado de un artículo por su ID
-const getArticleStatus = async(connection, article_id) => {
-    const [result] = await connection.query("SELECT ar.status FROM articles ar WHERE ar.id = ?", [article_id]);
-    return result[0] ? result[0].status : null;
+// 10. Obtener la información de un artículo por su ID
+const getArticleInfo = async(connection, article_id) => {
+    const [result] = await connection.query("SELECT ar.status, ar.user_id FROM articles ar WHERE ar.id = ?", [article_id]);
+    return result[0] ? result[0] : null;
 }
 
-module.exports = { getAll, getById, getByUserId,updateById, updateStatus, create, deleteById, existsArticleById, updateReportArticleStatus, getArticleStatus };
+module.exports = { getAll, getById, getByUserId,updateById, updateStatus, create, deleteById, existsArticleById, updateReportArticleStatus, getArticleInfo };
     

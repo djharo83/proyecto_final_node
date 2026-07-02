@@ -44,11 +44,21 @@ const createReport = async (req, res, next) => {
             body.article_id = article_id;
 
             // Obtener la información necesaria para actualizar el artículo
-            const articleStatus = await ArticlesModel.getArticleStatus(connection, article_id);
+            const articleInfo = await ArticlesModel.getArticleInfo(connection, article_id);
 
-            if (!articleStatus) {
+
+            if (!articleInfo || articleInfo.status === ArticleStatusEnum.RESOLVED) { // O el enum que uses para resuelto
                 await connection.rollback();
-                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'El articulo que quiere reportar no existe o ha sido resuelto'});
+                return res.status(StatusCodes.BAD_REQUEST).json({ 
+                    message: 'El articulo que quiere reportar no existe o ya ha sido resuelto por el moderador.'
+                });
+            }
+
+            const {status:articleStatus, user_id:article_owner_id} = articleInfo;
+
+            if (reporter_id === article_owner_id) {
+                await connection.rollback();
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: 'No puedes reportar un articulo que te pertenece' });
             }
 
             // Si el artículo ya está 'En revisión', no hacemos lógica de actualización de estados, 
