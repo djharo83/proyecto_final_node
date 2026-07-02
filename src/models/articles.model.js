@@ -130,17 +130,30 @@ const create = async (articleData, photoUrls) => {
 
 // 5. Modificar los datos generales de un artículo y devolverlo actualizado
 const updateById = async (id, articleData) => {
-    const { title, description, price, condition, location, category_id } = articleData;
+    const { title, description, price, condition, location, category_id, status } = articleData;
     
-    // 1. Hacemos la actualización
+    // 1. Obtenemos el artículo actual para saber su estado antes de cambiarlo
+    const articuloActual = await getById(id);
+    if (!articuloActual) return null;
+
+    // Si viene un nuevo status y es distinto del actual, guardamos el anterior en previous_status
+    let finalPreviousStatus = articuloActual.previous_status;
+    let finalStatus = articuloActual.status;
+
+    if (status && status !== articuloActual.status) {
+        finalPreviousStatus = articuloActual.status;
+        finalStatus = status;
+    }
+
+    // 2. Hacemos la actualización incluyendo las columnas de estado
     await db.query(
         `UPDATE articles 
-         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?
+         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?, previous_status = ?, status = ?
          WHERE id = ?`,
-        [title, description, price, condition, location, category_id, id]
+        [title, description, price, condition, location, category_id, finalPreviousStatus, finalStatus, id]
     );
     
-    // 2. Retornamos el artículo tal y como está en la BD ahora mismo
+    // 3. Retornamos el artículo tal y como está en la BD ahora mismo
     return await getById(id);
 };
 

@@ -27,7 +27,11 @@ const articleSchema = yup.object().shape({
     photoUrls: yup
         .array()
         .of(yup.string())
-        .optional()
+        .optional(), 
+    status: yup
+        .string()
+        .oneOf(['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido'], 'Ese estado del ciclo de vida no existe')
+        .optional()         
 });
 
 const statusSchema = yup.object().shape({
