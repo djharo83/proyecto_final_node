@@ -132,45 +132,34 @@ const create = async (articleData, photoUrls) => {
 const updateById = async (id, articleData) => {
     const { title, description, price, condition, location, category_id, status } = articleData;
     
-    // 1. Obtenemos el artículo actual para saber su estado antes de cambiarlo
+    // Obtenemos el artículo actual para saber su estado en caso de que no venga uno nuevo en el PUT
     const articuloActual = await getById(id);
     if (!articuloActual) return null;
 
-    // Si viene un nuevo status y es distinto del actual, guardamos el anterior en previous_status
-    let finalPreviousStatus = articuloActual.previous_status;
-    let finalStatus = articuloActual.status;
+    const finalStatus = status || articuloActual.status;
 
-    if (status && status !== articuloActual.status) {
-        finalPreviousStatus = articuloActual.status;
-        finalStatus = status;
-    }
-
-    // 2. Hacemos la actualización incluyendo las columnas de estado
+    // Hacemos la actualización limpia de datos generales + estado
     await db.query(
         `UPDATE articles 
-         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?, previous_status = ?, status = ?
+         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?, status = ?
          WHERE id = ?`,
-        [title, description, price, condition, location, category_id, finalPreviousStatus, finalStatus, id]
+        [title, description, price, condition, location, category_id, finalStatus, id]
     );
     
-    // 3. Retornamos el artículo tal y como está en la BD ahora mismo
+    // Retornamos el artículo actualizado
     return await getById(id);
 };
 
 // 6. Cambiar únicamente el estado y devolver el artículo actualizado
 const updateStatus = async (id, newStatus) => {
 
-    // 1. Obtenemos el artículo actual para saber su status antes de cambiarlo
-    const articuloActual = await getById(id);
-    if (!articuloActual) return null;
-
-    // 2. Actualizamos el status nuevo y guardamos el anterior en previous_status
+    // Actualizamos únicamente el status nuevo, sin tocar previous_status
     await db.query(
-        "UPDATE articles SET previous_status = ?, status = ? WHERE id = ?",
-        [articuloActual.status, newStatus, id]
+        "UPDATE articles SET status = ? WHERE id = ?",
+        [newStatus, id]
     );
     
-    // 3. Retornamos el artículo ya actualizado
+    // Retornamos el artículo ya actualizado
     return await getById(id);
 };
 
