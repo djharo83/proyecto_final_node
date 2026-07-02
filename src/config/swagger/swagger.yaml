@@ -7,17 +7,34 @@ info:
 paths:
   /api/articles/user/me:
     get:
-      summary: Obtiene todos los artículos del usuario logueado
-      description: Devuelve el inventario completo (publicados, vendidos, borradores) del usuario autenticado.
+      summary: Obtener los artículos del usuario autenticado ("Mis Productos")
+      description: Devuelve un listado con todos los artículos que pertenecen al usuario autenticado, sin filtrar por estado (incluye Borrador, Publicado, En revisión, Retirado, Vendido, etc.). Requiere token de autenticación.
       tags:
         - Artículos
       security:
-        - bearerAuth: []
+        - bearerAuth: []  # Asegúrate de que coincida con el nombre de tu esquema de seguridad en el YAML
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Número de página para la paginación.
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          description: Cantidad de artículos a retornar por página.
+          schema:
+            type: integer
+            default: 10
       responses:
         '200':
-          description: Listado de los artículos del usuario obtenido con éxito.
-        '403':
-          description: Token no proporcionado o incorrecto.
+          description: Listado de artículos propios devuelto con éxito.
+        '401':
+          description: No autorizado (Token ausente o inválido).
+        '500':
+          description: Error interno del servidor.
 
   /api/articles:
     get:
@@ -164,34 +181,45 @@ paths:
           description: Artículo obtenido.
 
     put:
-      summary: Edita un artículo completo
-      description: Modifica los datos principales. Solo el propietario puede hacerlo.
-      tags:
-        - Artículos
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema: { type: integer }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [title, description, price, condition, category_id, location]
-              properties:
-                title: { type: string, example: "Bicicleta mejorada" }
-                description: { type: string, example: "Suspensión nueva." }
-                price: { type: number, format: float, example: 220.00 }
-                condition: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], example: "Buen estado" }
-                category_id: { type: integer, example: 3 }
-                location: { type: string, example: "Madrid" }
-      responses:
-        '200':
-          description: Artículo actualizado exitosamente.
+          summary: Edita un artículo completo
+          description: Modifica los datos principales. Solo el propietario puede hacerlo.
+          tags:
+            - Artículos
+          security:
+            - bearerAuth: []
+          parameters:
+            - in: path
+              name: id
+              required: true
+              schema: { type: integer }
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: [title, description, price, condition, category_id, location]
+                  properties:
+                    title: { type: string, example: "Bicicleta mejorada" }
+                    description: { type: string, example: "Suspensión nueva." }
+                    price: { type: number, format: float, example: 220.00 }
+                    condition: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], example: "Buen estado" }
+                    category_id: { type: integer, example: 3 }
+                    location: { type: string, example: "Madrid" }
+                    status: { type: string, enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido'], example: "Borrador" }
+          responses:
+            '200':
+              description: Artículo actualizado exitosamente.
+            '400':
+              description: Error de validación en los campos enviados o ID del artículo no válido.
+            '401':
+              description: No autorizado (Token ausente o inválido).
+            '403':
+              description: Acceso denegado (El usuario autenticado no es el propietario del artículo).
+            '404':
+              description: No encontrado (No existe ningún artículo con el ID especificado).
+            '500':
+              description: Error interno del servidor.
 
     delete:
       summary: Elimina un artículo por su ID

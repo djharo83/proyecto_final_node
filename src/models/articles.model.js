@@ -130,34 +130,36 @@ const create = async (articleData, photoUrls) => {
 
 // 5. Modificar los datos generales de un artículo y devolverlo actualizado
 const updateById = async (id, articleData) => {
-    const { title, description, price, condition, location, category_id } = articleData;
+    const { title, description, price, condition, location, category_id, status } = articleData;
     
-    // 1. Hacemos la actualización
+    // Obtenemos el artículo actual para saber su estado en caso de que no venga uno nuevo en el PUT
+    const articuloActual = await getById(id);
+    if (!articuloActual) return null;
+
+    const finalStatus = status || articuloActual.status;
+
+    // Hacemos la actualización limpia de datos generales + estado
     await db.query(
         `UPDATE articles 
-         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?
+         SET title = ?, description = ?, price = ?, \`condition\` = ?, location = ?, category_id = ?, status = ?
          WHERE id = ?`,
-        [title, description, price, condition, location, category_id, id]
+        [title, description, price, condition, location, category_id, finalStatus, id]
     );
     
-    // 2. Retornamos el artículo tal y como está en la BD ahora mismo
+    // Retornamos el artículo actualizado
     return await getById(id);
 };
 
 // 6. Cambiar únicamente el estado y devolver el artículo actualizado
 const updateStatus = async (id, newStatus) => {
 
-    // 1. Obtenemos el artículo actual para saber su status antes de cambiarlo
-    const articuloActual = await getById(id);
-    if (!articuloActual) return null;
-
-    // 2. Actualizamos el status nuevo y guardamos el anterior en previous_status
+    // Actualizamos únicamente el status nuevo, sin tocar previous_status
     await db.query(
-        "UPDATE articles SET previous_status = ?, status = ? WHERE id = ?",
-        [articuloActual.status, newStatus, id]
+        "UPDATE articles SET status = ? WHERE id = ?",
+        [newStatus, id]
     );
     
-    // 3. Retornamos el artículo ya actualizado
+    // Retornamos el artículo ya actualizado
     return await getById(id);
 };
 

@@ -204,3 +204,83 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/api/articles/user/me
 Authorization: {{TOKEN_ADMIN}}
+
+###
+GET http://localhost:3000/api/articles?pageSize=100
+
+
+
+
+### =================================================================
+### CONFIGURACIÓN DE VARIABLES
+### =================================================================
+@baseUrl = http://localhost:3000
+# Si vas a probar directamente en Render, descomenta la siguiente línea y comenta la de arriba:
+# @baseUrl = https://proyecto-final-node-5pwe.onrender.com
+
+# Reemplaza este token por uno recién obtenido del login (Paso 1)
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiVXN1YXJpbyIsImlhdCI6MTc4MzAxNjY0NSwiZXhwIjoxNzgzMDIwMjQ1fQ.O50t3GYcaT3NPsv7jAN6UbA1EpLpDxpLdRseyHmD21U
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MzAxNjg2NywiZXhwIjoxNzgzMDIwNDY3fQ.jzSxZZi-KN4Saaolz7NgDbDmr46zETYlkYKjmqdA-Sk
+# El ID de un artículo que te pertenezca para hacer las pruebas
+@articleId = 10004
+
+
+### =================================================================
+### 1. LOGIN PARA OBTENER TOKEN NUEVO (Opcional, por si expira)
+### =================================================================
+POST {{baseUrl}}/api/users/login
+Content-Type: application/json
+
+{
+    "email": "admin@gmail.com",
+    "password": "chorizo"
+}
+
+
+### =================================================================
+### 2. PRUEBA: "MIS PRODUCTOS" (Debe traer borradores, vendidos, etc.)
+### =================================================================
+# Ejecuta esto y verifica que en el listado aparezcan tus artículos 
+# sin importar el estado (incluso si están en "Borrador" o "Vendido").
+GET {{baseUrl}}/api/articles/user/me
+Authorization: Bearer {{token}}
+
+
+### =================================================================
+### 3. PRUEBA: EDITAR ARTÍCULO CON ESTADO (PUT)
+### =================================================================
+# Prueba de edición completa enviando el campo "status".
+# Verifica que el artículo se actualice correctamente en la base de datos.
+PUT {{baseUrl}}/api/articles/{{articleId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "title": "Teclado Razer Modificado de Prueba",
+  "description": "Edición completa a través del método PUT con estado",
+  "price": 85.00,
+  "condition": "Como nuevo",
+  "location": "Alicante",
+  "status": "Borrador"
+}
+
+
+### =================================================================
+### 4. PRUEBA: CAMBIAR SOLO EL ESTADO (PATCH)
+### =================================================================
+# Comprobación de que el PATCH actualiza solo el estado a "Vendido".
+# (Y según lo hablado con Diego, ya no alterará previous_status en la base de datos).
+PATCH {{baseUrl}}/api/articles/{{articleId}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "Vendido"
+}
+
+###
+GET {{baseUrl}}/api/admin/stats
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTc5ODg0MywiZXhwIjoxTzgxODAyNDQzfQ.kz6IPtsnGSXN66dnTUmBb04ut6yEOFRfp5VY8LPb_FY
+
+
