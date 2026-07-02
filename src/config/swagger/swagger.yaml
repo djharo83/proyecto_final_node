@@ -6,33 +6,35 @@ info:
 
 paths:
   /api/articles/user/me:
-      get:
-        summary: Obtener los artículos del usuario autenticado ("Mis Productos")
-        description: Devuelve un listado con todos los artículos que pertenecen al usuario autenticado, sin filtrar por estado (incluye Borrador, Publicado, En revisión, Retirado, Vendido, etc.). Requiere token de autenticación.
-        security:
-          - bearerAuth: []  # Asegúrate de que coincida con el nombre de tu esquema de seguridad en el YAML
-        parameters:
-          - name: page
-            in: query
-            required: false
-            description: Número de página para la paginación.
-            schema:
-              type: integer
-              default: 1
-          - name: pageSize
-            in: query
-            required: false
-            description: Cantidad de artículos a retornar por página.
-            schema:
-              type: integer
-              default: 10
-        responses:
-          '200':
-            description: Listado de artículos propios devuelto con éxito.
-          '401':
-            description: No autorizado (Token ausente o inválido).
-          '500':
-            description: Error interno del servidor.
+    get:
+      summary: Obtener los artículos del usuario autenticado ("Mis Productos")
+      description: Devuelve un listado con todos los artículos que pertenecen al usuario autenticado, sin filtrar por estado (incluye Borrador, Publicado, En revisión, Retirado, Vendido, etc.). Requiere token de autenticación.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []  # Asegúrate de que coincida con el nombre de tu esquema de seguridad en el YAML
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Número de página para la paginación.
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          description: Cantidad de artículos a retornar por página.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Listado de artículos propios devuelto con éxito.
+        '401':
+          description: No autorizado (Token ausente o inválido).
+        '500':
+          description: Error interno del servidor.
 
   /api/articles:
     get:
