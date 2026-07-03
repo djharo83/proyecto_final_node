@@ -16,7 +16,7 @@ const getAllArticles = async (req, res) => {
         const articles = await ArticlesModel.getAll(page, pageSize, filters);
         
         // Devolvemos metadatos de la página
-        res.json({
+        res.status(200).json({
             info: {
                 page: page,
                 pageSize: pageSize,
