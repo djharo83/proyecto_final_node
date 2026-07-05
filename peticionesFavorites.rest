@@ -1,0 +1,20 @@
+### Obtener todos los favoritos de un usuario
+GET http://localhost:3000/api/favorites/user
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMzc1OTU4LCJleHAiOjE3ODE0NjIzNTh9.ECPr-9aoO-vb8uVDF90PQ_abyVCMIDkheoNERd3qJ7c
+
+#### Obtener favorito por ID
+GET http://localhost:3000/api/favorites/3
+
+### Crear una nuevo favorito
+POST http://localhost:3000/api/favorites
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMzLCJyb2xlIjoiQWRtaW5pc3RyYWRvciIsImlhdCI6MTc4MTQ1NjE2MSwiZXhwIjoxNzgxNTQyNTYxfQ.TjtPoGHVvl48NgSiI34qAuA11kc1SuEZjqHx-q9v6dI
+Content-Type: application/json
+
+{
+  "user_id": 44,
+  "article_id": 47
+}
+
+### Eliminar un favorito existente
+DELETE http://localhost:3000/api/favorites/24
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiTW9kZXJhZG9yIiwiaWF0IjoxNzgxMzc1OTU4LCJleHAiOjE3ODE0NjIzNTh9.ECPr-9aoO-vb8uVDF90PQ_abyVCMIDkheoNERd3qJ7c

@@ -1,0 +1,1778 @@
+openapi: 3.0.0
+info:
+  title: API Proyecto Final
+  version: 1.0.0
+  description: Documentación de los endpoints del backend en Node.js
+
+paths:
+  /api/articles/user/me:
+    get:
+      summary: Obtener los artículos del usuario autenticado ("Mis Productos")
+      description: Devuelve un listado con todos los artículos que pertenecen al usuario autenticado, sin filtrar por estado (incluye Borrador, Publicado, En revisión, Retirado, Vendido, etc.). Requiere token de autenticación.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []  # Asegúrate de que coincida con el nombre de tu esquema de seguridad en el YAML
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Número de página para la paginación.
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          description: Cantidad de artículos a retornar por página.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Listado de artículos propios devuelto con éxito.
+        '401':
+          description: No autorizado (Token ausente o inválido).
+        '500':
+          description: Error interno del servidor.
+
+  /api/articles:
+    get:
+      summary: Obtiene todos los artículos con paginación y filtros
+      description: Retorna una lista paginada de artículos. Por defecto muestra los de estado 'Publicado', pero permite filtrar por categoría, precio, estado de conservación, texto y estado del ciclo de vida.
+      tags:
+        - Artículos
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 10 }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: filterStatus
+          in: query
+          schema: { type: string, enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido'] }
+        - name: category_id
+          in: query
+          schema: { type: integer }
+        - name: min_price
+          in: query
+          schema: { type: number, format: float }
+        - name: max_price
+          in: query
+          schema: { type: number, format: float }
+        - name: condition
+          in: query
+          schema: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'] }
+      responses:
+        '200':
+          description: Lista de artículos y metadatos de paginación devueltos con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: object
+                    description: Metadatos de la paginación (útil para el Frontend).
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      pageSize:
+                        type: integer
+                        example: 10
+                      count:
+                        type: integer
+                        description: Cantidad de elementos devueltos en esta página.
+                        example: 10
+                  results:
+                    type: array
+                    description: Listado de artículos que coinciden con la búsqueda.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 3
+                        title:
+                          type: string
+                          example: "Bicicleta de montaña"
+                        description:
+                          type: string
+                          example: "Bicicleta de montaña poco usada"
+                        location:
+                          type: string
+                          example: "Almería"
+                        price:
+                          type: number
+                          format: float
+                          example: 250.50
+                        condition:
+                          type: string
+                          example: "Usado"
+                        status:
+                          type: string
+                          example: "Publicado"
+                        category_id:
+                          type: integer
+                          example: 3
+                        main_photo:
+                          type: string
+                          nullable: true
+                          example: "https://imagenes.com/foto1.jpg"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2026-06-09T20:00:00Z"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2026-06-09T20:00:00Z"
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      summary: Crea un nuevo artículo con imágenes
+      description: Requiere token de autenticación. El user_id se extrae automáticamente del token.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [title, price, category_id, condition, location]
+              properties:
+                category_id: { type: integer, example: 1 }
+                title: { type: string, example: "Teclado Gaming Razer" }
+                description: { type: string, example: "Teclado mecanico RGB" }
+                price: { type: number, format: float, example: 89.99 }
+                condition: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], example: "Nuevo" }
+                location: { type: string, example: "Alicante" }
+                images:
+                  type: array
+                  items: { type: string, format: binary }
+      responses:
+        '201':
+          description: Artículo creado.
+
+  /api/articles/{id}:
+    get:
+      summary: Obtiene un artículo por su ID
+      tags:
+        - Artículos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Artículo obtenido.
+
+    put:
+          summary: Edita un artículo completo
+          description: Modifica los datos principales. Solo el propietario puede hacerlo.
+          tags:
+            - Artículos
+          security:
+            - bearerAuth: []
+          parameters:
+            - in: path
+              name: id
+              required: true
+              schema: { type: integer }
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required: [title, description, price, condition, category_id, location]
+                  properties:
+                    title: { type: string, example: "Bicicleta mejorada" }
+                    description: { type: string, example: "Suspensión nueva." }
+                    price: { type: number, format: float, example: 220.00 }
+                    condition: { type: string, enum: ['Nuevo', 'Como nuevo', 'Buen estado', 'Aceptable'], example: "Buen estado" }
+                    category_id: { type: integer, example: 3 }
+                    location: { type: string, example: "Madrid" }
+                    status: { type: string, enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido'], example: "Borrador" }
+          responses:
+            '200':
+              description: Artículo actualizado exitosamente.
+            '400':
+              description: Error de validación en los campos enviados o ID del artículo no válido.
+            '401':
+              description: No autorizado (Token ausente o inválido).
+            '403':
+              description: Acceso denegado (El usuario autenticado no es el propietario del artículo).
+            '404':
+              description: No encontrado (No existe ningún artículo con el ID especificado).
+            '500':
+              description: Error interno del servidor.
+
+    delete:
+      summary: Elimina un artículo por su ID
+      description: Solo el propietario del artículo puede eliminarlo.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Artículo eliminado exitosamente.
+
+  /api/articles/{id}/status:
+    patch:
+      summary: Cambia el estado de un artículo (Ej. Marcar como Vendido)
+      description: Permite al propietario actualizar la fase del ciclo de vida del artículo.
+      tags:
+        - Artículos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: ['Borrador', 'Publicado', 'En revisión', 'Retirado', 'Vendido']
+                  example: "Vendido"
+      responses:
+        '200':
+          description: Estado actualizado con éxito.
+
+  /api/categories/landing:
+    get:
+      summary: Obtiene todas las categorías para la página de inicio
+      description: Devuelve todas las categorías disponibles para mostrarlas en la página de inicio.
+      tags:
+        - Categorías
+      responses:
+        '200':
+          description: Lista de categorías obtenida con éxito.
+
+  /api/categories:
+    get:
+      summary: Obtiene todas las categorías
+      tags:
+        - Categorías
+      responses:
+        '200':
+          description: Lista de categorías obtenida con éxito.
+    post:
+      summary: Crea una nueva categoría
+      security:
+        - bearerAuth: []
+      tags:
+        - Categorías
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  example: "Nueva categoría"
+                slug:
+                  type: string
+                  minLength: 1
+                  example: "new-category"
+      responses:
+        '201':
+          description: Categoría creada con éxito.
+
+  /api/categories/{id}:
+    get:
+      summary: Obtiene una categoría por su ID
+      tags:
+        - Categorías
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoría encontrada.
+    put:
+      summary: Actualiza una categoría por su ID
+      security:
+        - bearerAuth: []
+      tags:
+        - Categorías
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - slug
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  description: Nuevo nombre de la categoría
+                  example: "Modificar Nueva categoría"
+                slug:
+                  type: string
+                  minLength: 1
+                  description: Nuevo slug de la categoría
+                  example: "update-category"
+      responses:
+        '200':
+          description: Actualizado.
+    delete:
+      summary: Elimina una categoría por su ID
+      security:
+        - bearerAuth: []
+      tags:
+        - Categorías
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoría eliminada exitosamente.
+
+  /api/favorites/user:
+    get:
+      summary: Obtiene todos los favoritos de un usuario autenticado
+      security:
+        - bearerAuth: []
+      tags:
+        - Favoritos
+      responses:
+        '200':
+          description: Lista de artículos favoritos con su categoria e imagenes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesArticleResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+                
+  /api/favorites:
+    post:
+      summary: Añade un elemento a favoritos
+      security:
+        - bearerAuth: []
+      tags:
+        - Favoritos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - article_id
+              properties:
+                article_id:
+                  type: integer
+                  description: ID del artículo que se añade como favorito
+                  example: 3
+      responses:
+        '201':
+          description: Información del favorito creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteCreatedResponse'
+        '400':
+          description: El artículo ya se encuentra en la lista de favoritos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestFavoriteCreatedResponse'
+        '404':
+          description: El artículo que se quiere añadir a favoritos no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundFavoriteCreatedResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/favorites/{id}:
+    get:
+      summary: Obtiene un favorito por su ID
+      tags:
+        - Favoritos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Favorito obtenido.
+    delete:
+      summary: Elimina un favorito por su ID
+      security:
+        - bearerAuth: []
+      tags:
+        - Favoritos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Eliminado.
+
+  /api/users:
+    get:
+      summary: Obtiene todos los usuarios registrados
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Listado obtenido.
+
+  /api/users/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  example: "carlos_vende"
+                email:
+                  type: string
+                  example: "carlos@email.com"
+                password:
+                  type: string
+                  example: "Test1234!"
+      responses:
+        '201':
+          description: Usuario registrado correctamente.
+        '409':
+          description: El email o el nombre de usuario ya están en uso.
+
+  /api/users/login:
+    post:
+      summary: Iniciar sesión de usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: "carlos@email.com"
+                password:
+                  type: string
+                  example: "Test1234!"
+      responses:
+        '200':
+          description: Login correcto, devuelve el token JWT.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login correcto"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Email o contraseña incorrectos.
+        '403':
+          description: La cuenta del usuario está bloqueada.
+
+  /api/users/profile:
+    put:
+      summary: Editar el perfil del usuario autenticado
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                location:
+                  type: string
+                avatar_url:
+                  type: string
+      responses:
+        '200':
+          description: Actualizado.
+
+  /api/users/change-password:
+    put:
+      summary: Cambia la contraseña del usuario autenticado
+      description: El usuario debe indicar su contraseña actual para verificarla antes de guardar la nueva. El userId se obtiene automáticamente del token, por lo que nadie puede cambiar la contraseña de otro usuario.
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  example: "Test1234!"
+                newPassword:
+                  type: string
+                  minLength: 6
+                  example: "NuevaPass123!"
+      responses:
+        '200':
+          description: Contraseña actualizada correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Contraseña actualizada correctamente"
+        '401':
+          description: La contraseña actual no es correcta.
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: El usuario no existe.
+
+  /api/users/{userId}:
+    get:
+      summary: Obtiene un usuario por su ID
+      description: Devuelve los datos públicos de un usuario concreto.
+      tags:
+        - Usuarios
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 4
+      responses:
+        '200':
+          description: Usuario encontrado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 4
+                  username:
+                    type: string
+                    example: "carlos_vende"
+                  email:
+                    type: string
+                    example: "carlos@email.com"
+                  role:
+                    type: string
+                    example: "Usuario"
+                  status:
+                    type: string
+                    example: "Activo"
+                  avatar_url:
+                    type: string
+                    nullable: true
+                    example: null
+                  location:
+                    type: string
+                    example: "Madrid"
+                  created_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: El usuario no existe con ese ID.
+
+  /api/reports:
+    post:
+      summary: Crear un nuevo reporte (de artículo o de usuario)
+      description: |
+        El reporter_id se obtiene automáticamente del token.
+        - Si el tipo es **'Articulo'**: se debe enviar article_id. El artículo reportado cambia automáticamente su status a **'En revisión'** y su status anterior queda guardado en el campo **previous_status** para poder recuperarlo después.
+        - Si el tipo es **'Usuario'**: se debe enviar reported_user_id.
+        No se puede enviar article_id and reported_user_id a la vez.
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - reason
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Articulo
+                    - Usuario
+                  example: "Articulo"
+                article_id:
+                  type: integer
+                  description: Obligatorio si type es 'Articulo'.
+                  example: 11
+                reported_user_id:
+                  type: integer
+                  description: Obligatorio si type es 'Usuario'.
+                  example: 10
+                reason:
+                  type: string
+                  example: "El precio parece muy bajo, podría ser fraudulento"
+      responses:
+        '201':
+          description: Reporte creado con éxito. Si el tipo es 'Articulo', el artículo pasa automáticamente a 'En revisión'.
+        '400':
+          description: Faltan campos obligatorios o se han enviado campos incompatibles con el tipo de reporte.
+
+  /api/reports/pending/articles:
+    get:
+      summary: Reportes pendientes para los artículos (Accesible Solo para el Moderador o Adminsitrador)
+      description: Obtiene los reportes pendientes para los artículos (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reportes pendientes para los articulos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsArticlesResponse'
+
+  /api/reports/pending/articles/{id}:
+    get:
+      summary: Detalle del reporte pendiente para un artículo (Accesible Solo para el Moderador o Adminsitrador)
+      description: Obtiene el detalle de un reporte pendiente para un artículo (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del reporte.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalle del reporte pendiente para un artículo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportArticleResponse'
+  
+  /api/reports/pending/users:
+    get:
+      summary: Reportes pendientes para los usuarios (Accesible Solo para el Moderador o Adminsitrador)
+      description: Obtiene los reportes pendientes para los usuarios (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reportes pendientes para los usuarios.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsUsersResponse'
+
+  /api/reports/pending/users/{id}:
+    get:
+      summary: Detalle del reporte pendiente para un usuario. (Accesible Solo para el Moderador o Adminsitrador)
+      description: Obtiene el detalle del reporte pendiente para un usuario (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del reporte.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalle del reporte pendiente para un usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportUserResponse'
+
+  /api/reports/history:
+    get:
+      summary: Lista de reportes resueltos para articulos y usuarios. (Accesible Solo para el Moderador o Adminsitrador)
+      description: Obtiene una lista de reportes resueltos tanto para artículos como para reportes (Accesible Solo para el Moderador o Adminsitrador)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reportes resueltos para articulos y usuarios.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsHistoryResponse'
+
+  /api/reports/resolution/{id}:
+    put:
+      summary: Resolución del reporte(de artículo o de usuario) (Accesible Solo para el Moderador o Adminsitrador)
+      description: Resuelve el reporte de un usuario o un articulo (accept-Acepta el reporte y Retira el artículo o reject-Rechaza el reporte y devuelve el artículo a su estado original)
+      tags:
+        - Reportes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador único del reporte.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - moderator_note
+              properties:
+                action:
+                  type: string
+                  example: "accept ó reject"
+                moderator_note:
+                  type: string
+                  example: "El artículo infringe las normas o El artículo cumple las normas"
+      responses:
+        '200':
+          description: Reporte resuelto correctamente.
+
+  /api/admin/stats:
+    get:
+      summary: Estadísticas globales de la plataforma
+      description: Devuelve artículos publicados, usuarios activos, reportes gestionados y artículos vendidos. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Estadísticas obtenidas con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  articulosPublicados:
+                    type: integer
+                    example: 10
+                  usuariosActivos:
+                    type: integer
+                    example: 8
+                  reportesGestionados:
+                    type: integer
+                    example: 2
+                  articulosVendidos:
+                    type: integer
+                    example: 1
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users:
+    get:
+      summary: Obtiene el listado completo de usuarios
+      description: Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Listado de usuarios obtenido con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 7
+                    username:
+                      type: string
+                      example: "laura_moda"
+                    email:
+                      type: string
+                      example: "laura@email.com"
+                    role:
+                      type: string
+                      enum:
+                        - Usuario
+                        - Moderador
+                        - Administrador
+                      example: "Usuario"
+                    status:
+                      type: string
+                      enum:
+                        - Activo
+                        - Bloqueado
+                      example: "Activo"
+                    avg_rating:
+                      type: number
+                      format: float
+                      example: 4.50
+                    location:
+                      type: string
+                      example: "Barcelona"
+                    created_at:
+                      type: string
+                      format: date-time
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}:
+    get:
+      summary: Obtiene un usuario por su ID
+      description: Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: Usuario encontrado.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+    put:
+      summary: Edita los datos de un usuario
+      description: Permite modificar username, email y location de cualquier usuario. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "pepematias"
+                email:
+                  type: string
+                  example: "pepematias@email.com"
+                location:
+                  type: string
+                  example: "Logroño"
+      responses:
+        '200':
+          description: Usuario actualizado con éxito.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+    delete:
+      summary: Elimina un usuario
+      description: Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: Usuario eliminado correctamente.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/role:
+    put:
+      summary: Cambia el rol de un usuario
+      description: Permite asignar el rol Usuario, Moderador o Administrador. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum:
+                    - Usuario
+                    - Moderador
+                    - Administrador
+                  example: "Moderador"
+      responses:
+        '200':
+          description: Rol actualizado con éxito.
+        '400':
+          description: El rol enviado no es válido.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/block:
+    put:
+      summary: Bloquea la cuenta de un usuario
+      description: Cambia el status del usuario a 'Bloqueado'. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      responses:
+        '200':
+          description: Usuario bloqueado con éxito.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/unblock:
+    put:
+      summary: Desbloquea la cuenta de un usuario
+      description: Cambia el status del usuario a 'Activo'. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 12
+      responses:
+        '200':
+          description: Usuario desbloqueado con éxito.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/admin/users/{userId}/password:
+    put:
+      summary: Cambia la contraseña de cualquier usuario
+      description: Permite al Administrador establecer una nueva contraseña para cualquier usuario sin necesidad de conocer la contraseña actual. Solo accesible para Administrador.
+      tags:
+        - Administrador
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          example: 7
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  minLength: 6
+                  example: "NuevaPass123!"
+      responses:
+        '200':
+          description: Contraseña del usuario actualizada correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Contraseña del usuario laura_moda actualizada correctamente"
+        '400':
+          description: La nueva contraseña no cumple los requisitos mínimos.
+        '404':
+          description: El usuario no existe con ese ID.
+        '403':
+          description: Acceso denegado, requiere rol Administrador.
+
+  /api/conversations:
+    get:
+      summary: Obtener la bandeja de entrada (inbox) del usuario autenticado
+      description: Devuelve la lista de chats activos donde el usuario autenticado participa como comprador o vendedor.
+      tags:
+        - Conversaciones (Bandeja de Entrada)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de conversaciones recuperada con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConversationInbox'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      summary: Iniciar o recuperar una conversación para un artículo
+      description: Comprueba si ya existe un chat activo entre el comprador autenticado y el dueño del artículo. Si no existe, crea una fila nueva en la base de datos.
+      tags:
+        - Conversaciones (Bandeja de Entrada)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - article_id
+              properties:
+                article_id:
+                  type: integer
+                  description: ID del artículo sobre el cual se quiere chatear.
+                  example: 9999
+      responses:
+        '200':
+          description: Conversación creada o recuperada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          description: Error en la solicitud (por ejemplo, intentar iniciar un chat contigo mismo).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No puedes iniciar un chat contigo mismo"
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: El artículo especificado no existe.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Artículo no encontrado"
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/messages/{conversationId}:
+    get:
+      summary: Obtener el historial de mensajes de una conversación
+      description: Devuelve el array de mensajes asociados a una conversación ordenados de forma ascendente por su fecha de envío.
+      tags:
+        - Mensajes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: ID de la conversación de la que se desea obtener el historial.
+          schema:
+            type: integer
+          example: 15
+      responses:
+        '200':
+          description: Historial de mensajes recuperado con éxito.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications/user:
+    get:
+      summary: Obtiene las notificaciones no leidas de un usuario.
+      description: Servicio para obtener las notificaciones no leidas sobre los articulos de un usuario.
+      security:
+        - bearerAuth: []
+      tags:
+        - Notificaciones
+      responses:
+        '200':
+          description: Lista de notificaciones no leidas de un usuario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsUserResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/notifications/{id}/read:
+    put:
+      summary: Actualiza la notificacion de un usuario a leida.
+      description: Servicio para actualizar como leida una notificacion del usuario.
+      security:
+        - bearerAuth: []
+      tags:
+        - Notificaciones
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notificación marcada como leída.
+        '204':
+          description: La notificación solicitada no existe.
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Introduce tu token JWT sin la palabra 'Bearer'. Solo el texto del token.
+
+  responses:
+    UnauthorizedError:
+      description: Token no proporcionado o incorrecto.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: El token es obligatorio en la cabecera Authorization
+    ServerError:
+      description: Error interno del servidor.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Error de conexión con la base de datos
+              message:
+                type: string
+                example: Error interno del servidor
+
+  schemas:
+    FavoritesArticleResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              favoriteId:
+                type: integer
+                example: 22
+              favoriteUserId:
+                type: integer
+                example: 16
+              favoriteArticleId:
+                type: integer
+                example: 1
+              articleId:
+                type: integer
+                example: 1
+              ownerArticleId:
+                type: integer
+                example: 1
+              title:
+                type: string
+                example: iPhone 13 Pro
+              price:
+                type: string
+                example: '650.00'
+              condition:
+                type: string
+                example: Como nuevo
+              status:
+                type: string
+                example: Publicado
+              location:
+                type: string
+                example: Alicante
+              category:
+                $ref: '#/components/schemas/CategoryResponse'
+              photos:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PhotosResponse'
+
+    FavoriteCreatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Favorito creado exitosamente
+        favorite:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 38
+            user_id:
+              type: integer
+              example: 51
+            article_id:
+              type: integer
+              example: 7
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-23T08:27:05.000Z'
+          required:
+            - id
+            - user_id
+            - article_id
+            - created_at
+      required:
+        - message
+        - favorite
+      example:
+        message: Favorito creado exitosamente
+        favorite:
+          id: 38
+          user_id: 51
+          article_id: 7
+          created_at: '2026-06-23T08:27:05.000Z'
+
+    BadRequestFavoriteCreatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Este artículo ya está en tu lista de favoritos.
+      required:
+        - message
+      example:
+        message: Este artículo ya está en tu lista de favoritos.
+
+    NotFoundFavoriteCreatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: El artículo que intentas guardar en favoritos no existe.
+      required:
+        - message
+      example:
+        message: El artículo que intentas guardar en favoritos no existe.
+
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Electrónica
+        slug:
+          type: string
+          example: electronica
+
+    PhotosResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 18
+        url:
+          type: string
+          format: uri
+          example: https://res.cloudinary.com/demo/image/upload/iphone.jpg
+        order:
+          type: integer
+          example: 0
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 15
+        article_id:
+          type: integer
+          example: 9999
+        buyer_id:
+          type: integer
+          example: 16
+        seller_id:
+          type: integer
+          example: 23
+
+    ConversationInbox:
+      type: object
+      properties:
+        conversation_id:
+          type: integer
+          example: 15
+        article_id:
+          type: integer
+          example: 9999
+        buyer_id:
+          type: integer
+          example: 16
+        seller_id:
+          type: integer
+          example: 23
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-06-20T17:15:00.000Z"
+        article_title:
+          type: string
+          example: "Bicicleta Mágica de Prueba"
+        article_price:
+          type: number
+          format: float
+          example: 150.00
+        buyer_name:
+          type: string
+          example: "Ignacio30"
+        seller_name:
+          type: string
+          example: "Admin"
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 54
+        conversation_id:
+          type: integer
+          example: 15
+        sender_id:
+          type: integer
+          example: 16
+        content:
+          type: string
+          example: "Hola, me interesa la bicicleta"
+        is_read:
+          type: integer
+          enum: [0, 1]
+          example: 1
+        sent_at:
+          type: string
+          format: date-time
+          example: "2026-06-20T17:18:25.000Z"
+
+    ReportsArticlesResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              report_id:
+                type: integer
+                example: 26
+              report_reason:
+                type: string
+                example: me quedan pequeñas
+              report_created_at:
+                type: string
+                format: date-time
+                example: '2026-06-21T15:42:52.000Z'
+              reporter_username:
+                type: string
+                example: Admin
+              article_id:
+                type: integer
+                example: 18
+              article_title:
+                type: string
+                example: Abrigo de Invierno Plumas
+              article_price:
+                type: string
+                example: '120.00'
+            required:
+              - report_id
+              - report_reason
+              - report_created_at
+              - reporter_username
+              - article_id
+              - article_title
+              - article_price
+
+    ReportArticleResponse:
+      type: object
+      properties:
+        reportArticle:
+          type: object
+          properties:
+            report_id:
+              type: integer
+              example: 26
+            reason:
+              type: string
+              example: me quedan pequeñas
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-21T15:42:52.000Z'
+            article_id:
+              type: integer
+              example: 18
+            title:
+              type: string
+              example: Abrigo de Invierno Plumas
+            description:
+              type: string
+              example: Muy abrigado, talla XL. Color verde militar.
+            price:
+              type: string
+              example: '120.00'
+            condition:
+              type: string
+              example: Nuevo
+            location:
+              type: string
+              example: Madrid
+            previous_status:
+              type: string
+              example: Publicado
+            status:
+              type: string
+              example: En revisión
+            seller_id:
+              type: integer
+              example: 2
+            seller_username:
+              type: string
+              example: jose_dev
+            photos:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 54
+                  url:
+                    type: string
+                    format: uri
+                    example: https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=600&q=80
+                  order:
+                    type: integer
+                    example: 0
+
+    ReportsUsersResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              report_id:
+                type: integer
+                example: 31
+              report_reason:
+                type: string
+                example: me intenta estafar por el chat otra vez
+              report_created_at:
+                type: string
+                format: date-time
+                example: '2026-06-24T15:01:05.000Z'
+              reporter_username:
+                type: string
+                example: diego_vende
+              reported_user_id:
+                type: integer
+                example: 5
+              reported_username:
+                type: string
+                example: maria_compra
+            required:
+              - report_id
+              - report_reason
+              - report_created_at
+              - reporter_username
+              - reported_user_id
+              - reported_username
+
+    ReportUserResponse:
+      type: object
+      properties:
+        reportUser:
+          type: object
+          properties:
+            report_id:
+              type: integer
+              example: 5
+            reason:
+              type: string
+              example: me intenta estafar por el chat
+            created_at:
+              type: string
+              format: date-time
+              example: '2026-06-14T12:53:05.000Z'
+            reporter_user_id:
+              type: integer
+              example: 16
+            reporter_user_username:
+              type: string
+              example: Ignacio30
+            reported_user_id:
+              type: integer
+              example: 5
+            reported_user_username:
+              type: string
+              example: maria_compra
+            reported_user_email:
+              type: string
+              format: email
+              example: maria@email.com
+            reported_user_avatar:
+              type: string
+              format: uri
+              example: https://i.pravatar.cc/150?u=5
+            reported_user_avg_rating:
+              type: string
+              example: '4.80'
+            reported_user_location:
+              type: string
+              example: Sevilla
+            reported_user_status:
+              type: string
+              example: Activo
+
+    ReportsHistoryResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              report_id:
+                type: integer
+                example: 30
+              report_type:
+                type: string
+                example: Articulo
+              report_reason:
+                type: string
+                example: El precio parece muy bajo, podría ser fraudulento
+              resolution_note:
+                type: string
+                example: El artículo infringe las normas o las condiciones de la plataforma
+              resolution_date:
+                type: string
+                format: date-time
+                example: '2026-06-24T14:46:16.000Z'
+              moderator_username:
+                type: string
+                example: Moderador
+              reporter_username:
+                type: string
+                example: diego_vende
+
+    NotificationsUserResponse:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 19
+              user_id:
+                type: integer
+                example: 51
+              type:
+                type: string
+                example: Articulo_Rechazado
+              content:
+                type: string
+                example: 'Tu artículo Zapatillas Blancas ha sido retirado definitivamente de la plataforma por infringir las normas comunitarias.'
+              reference_id:
+                type: integer
+                example: 10
+              is_read:
+                type: integer
+                example: 0
+              created_at:
+                type: string
+                format: date-time
+                example: '2026-06-27T14:22:17.000Z'
+              updated_at:
+                type: string
+                format: date-time
+                example: '2026-06-28T08:59:30.000Z'
