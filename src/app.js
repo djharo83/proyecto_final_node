@@ -12,7 +12,7 @@ const allowedOrigins = [
     'http://localhost:4000',
     'http://localhost:3000',
     'https://proyecto-final-node-js86.onrender.com',
-    'https://recicleapp.vercel.app'
+    'https://recycleunir.vercel.app'
 ];                                               
 
 const corsOptions = {
